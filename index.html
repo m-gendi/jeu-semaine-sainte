@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aventure - La Semaine Sainte Copte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; font-family: 'Nunito', sans-serif;
+            background: #000;
+        }
+
+        #game-viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #E0F2F1);
+            transition: background 2s ease;
+        }
+
+        #world-container {
+            position: absolute;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            will-change: transform;
+        }
+
+        .scenery-segment {
+            position: relative;
+            width: 1200px;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background: #D2B48C;
+            border-top: 8px solid #C4A484;
+            z-index: 10;
+        }
+
+        .building {
+            position: absolute;
+            bottom: 150px;
+            background: #EEDCBB;
+            border: 2px solid #D4B483;
+            border-bottom: none;
+            cursor: pointer;
+            z-index: 8;
+        }
+        .building:hover { filter: brightness(1.1); }
+        
+        .dome {
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            background: #D4B483;
+        }
+
+        /* Character */
+        #character {
+            position: absolute;
+            bottom: 120px;
+            left: 150px;
+            width: 120px;
+            height: 180px;
+            z-index: 50;
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+
+        @keyframes legSwing { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(30deg); } }
+        @keyframes legSwingBack { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-30deg); } }
+        @keyframes bodyBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        .walking .leg-left { animation: legSwing 0.6s infinite ease-in-out; }
+        .walking .leg-right { animation: legSwingBack 0.6s infinite ease-in-out; }
+        .walking .body-part { animation: bodyBob 0.6s infinite ease-in-out; }
+
+        /* Overlays */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+        .overlay.active { display: flex; }
+
+        #interaction-prompt {
+            position: fixed;
+            bottom: 220px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 60;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -10px); } }
+
+        .btn-control {
+            width: 70px; height: 70px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; border: 2px solid white; color: white;
+            cursor: pointer; user-select: none;
+        }
+
+        #scene-canvas {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #444;
+        }
+
+        .choice-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            color: #1e293b;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            line-height: 1.2;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .choice-card:hover { border-color: #94a3b8; transform: translateY(-2px); }
+        .choice-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        #finish-screen {
+            position: fixed;
+            inset: 0;
+            background: #10B981;
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        #finish-screen.active { display: flex; }
+
+        .decor-item {
+            position: absolute;
+            z-index: 12;
+            pointer-events: none;
+        }
+        
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-viewport">
+        <div id="world-container"></div>
+        <div id="interaction-prompt">Appuyez sur ↑ pour entrer</div>
+
+        <!-- HUD -->
+        <div id="hud" class="fixed top-5 left-5 right-5 flex justify-between items-center z-50 pointer-events-none">
+            <div class="bg-white/90 px-4 py-2 rounded-full shadow-lg border border-stone-200 pointer-events-auto flex items-center gap-4">
+                <span id="current-day-label" class="font-bold text-stone-800">Chargement...</span>
+                <div class="h-4 w-px bg-stone-300"></div>
+                <span class="text-blue-600 font-bold">Score: <span id="score-display">0</span></span>
+            </div>
+            <div class="bg-amber-100/90 text-amber-900 px-4 py-2 rounded-full font-bold shadow-lg border border-amber-200 pointer-events-auto">
+                🕊️ <span id="token-count">0</span>
+            </div>
+        </div>
+
+        <!-- Character -->
+        <div id="character">
+            <svg viewBox="0 0 100 150" width="100%" height="100%">
+                <g class="leg-right" style="transform-origin: 50px 100px;">
+                    <rect x="52" y="100" width="10" height="40" fill="#D2B48C" rx="5" />
+                    <rect x="52" y="135" width="15" height="6" fill="#5D4037" rx="2" />
+                </g>
+                <g class="leg-left" style="transform-origin: 50px 100px;">
+                    <rect x="38" y="100" width="10" height="40" fill="#D2B48C" rx="5" />
+                    <rect x="33" y="135" width="15" height="6" fill="#5D4037" rx="2" />
+                </g>
+                <g class="body-part">
+                    <path d="M30 40 L70 40 L75 110 L25 110 Z" fill="#F5F5DC" stroke="#E2E2C0" />
+                    <path d="M30 40 Q50 35 70 40 L60 100 L40 100 Z" fill="#8B4513" opacity="0.9" />
+                    <circle cx="50" cy="25" r="15" fill="#E0AC69" />
+                    <path d="M35 25 Q35 45 50 48 Q65 45 65 25" fill="#4A3728" />
+                    <circle cx="45" cy="22" r="1.5" fill="black" />
+                    <circle cx="55" cy="22" r="1.5" fill="black" />
+                </g>
+            </svg>
+        </div>
+
+        <div id="controls" class="fixed bottom-8 right-8 flex gap-4 z-50">
+            <div id="btn-back" class="btn-control">⬅️</div>
+            <div id="btn-up" class="btn-control">⬆️</div>
+            <div id="btn-walk" class="btn-control">➡️</div>
+        </div>
+    </div>
+
+    <!-- Scene Overlay -->
+    <div id="scene-overlay" class="overlay">
+        <h2 id="scene-title" class="text-3xl font-bold mb-6 italic">Scène Sacrée</h2>
+        <div id="scene-canvas"></div>
+        <p id="scene-desc" class="text-center max-w-md mb-8 opacity-80"></p>
+        <button onclick="closeScene()" class="bg-white text-black px-10 py-3 rounded-full font-bold uppercase tracking-widest hover:bg-stone-200 transition">Sortir</button>
+    </div>
+
+    <!-- Enigma Screen -->
+    <div id="enigma-screen" class="overlay">
+        <div id="enigma-modal" class="bg-white rounded-3xl text-black max-w-5xl w-full p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 id="enigma-title" class="text-3xl font-bold text-stone-800">Étape du Chemin</h2>
+                    <p class="text-stone-500">Reconstituez l'histoire de ce jour pour continuer.</p>
+                </div>
+                <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl font-bold">
+                    Potentiel : <span id="potential-points">3</span> pts
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Event -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-blue-600 uppercase text-xs tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">1</span> Événement
+                    </h3>
+                    <div id="choices-event" class="grid grid-cols-1 gap-3"></div>
+                </div>
+                <!-- Verse -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-amber-600 uppercase text-xs tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">2</span> Verset
+                    </h3>
+                    <div id="choices-verse" class="grid grid-cols-1 gap-3"></div>
+                </div>
+                <!-- Rite -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-purple-600 uppercase text-xs tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">3</span> Rite
+                    </h3>
+                    <div id="choices-rite" class="grid grid-cols-1 gap-3"></div>
+                </div>
+            </div>
+
+            <div id="hint-box" class="hidden mb-8 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded-r-lg italic animate-pulse">
+                💡 <span id="hint-text"></span>
+            </div>
+
+            <div class="flex flex-col items-center gap-4 border-t pt-8">
+                <div id="error-msg" class="text-red-500 font-bold hidden">L'histoire est encore incomplète ou inexacte. Réessayez !</div>
+                <div class="flex flex-wrap justify-center gap-4 w-full">
+                    <button id="btn-skip" onclick="skipEnigma()" class="bg-stone-200 text-stone-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-stone-300 transition-all">
+                        Passer cette étape (0 pt)
+                    </button>
+                    <button id="btn-validate" onclick="checkEnigma()" class="bg-stone-800 text-white px-12 py-4 rounded-full font-bold text-lg hover:bg-stone-700 transition-all disabled:opacity-30">
+                        Valider mon témoignage
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finish Screen -->
+    <div id="finish-screen">
+        <h1 class="text-5xl font-bold mb-2">Pèlerinage Terminé !</h1>
+        <p class="text-xl mb-8 opacity-90 italic">"Christ est ressuscité, en vérité Il est ressuscité !"</p>
+        
+        <div class="bg-white/20 backdrop-blur-md p-8 rounded-3xl border border-white/30 mb-8 w-full max-w-md grid grid-cols-2 gap-6 text-left">
+            <div>
+                <p class="text-xs uppercase opacity-70">Points récoltés</p>
+                <p class="text-4xl font-black"><span id="final-score">0</span></p>
+            </div>
+            <div>
+                <p class="text-xs uppercase opacity-70">Colombes reçues</p>
+                <p class="text-4xl font-black"><span id="final-tokens">0</span></p>
+            </div>
+            <div>
+                <p class="text-xs uppercase opacity-70">Erreurs commises</p>
+                <p class="text-4xl font-black text-red-100"><span id="final-errors">0</span></p>
+            </div>
+            <div>
+                <p class="text-xs uppercase opacity-70">Indices utilisés</p>
+                <p class="text-4xl font-black text-blue-100"><span id="final-hints">0</span></p>
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="bg-white text-emerald-600 px-12 py-4 rounded-full font-bold text-xl shadow-2xl hover:scale-105 transition-transform">
+            Recommencer le Chemin
+        </button>
+    </div>
+
+    <script>
+        // Assets SVG Helper
+        const SVG_ASSETS = {
+            palm: (x, y) => `<svg class="decor-item" style="left:${x}px; bottom:${y}px; width:60px; height:80px;" viewBox="0 0 100 120"><path d="M50 110 Q50 60 50 10" stroke="#2D5A27" stroke-width="4" fill="none" /><path d="M50 30 Q80 20 90 50 M50 50 Q85 40 95 70 M50 70 Q80 65 85 90" stroke="#4CAF50" stroke-width="3" fill="none" /><path d="M50 30 Q20 20 10 50 M50 50 Q15 40 5 70 M50 70 Q20 65 15 90" stroke="#4CAF50" stroke-width="3" fill="none" /></svg>`,
+            cloth: (x, y, color) => `<svg class="decor-item" style="left:${x}px; bottom:${y}px; width:80px; height:40px;" viewBox="0 0 100 50"><path d="M10 40 Q30 35 50 40 Q70 45 90 40 L85 10 Q50 15 15 10 Z" fill="${color}" stroke="rgba(0,0,0,0.1)" /></svg>`,
+            coin: (x, y) => `<svg class="decor-item" style="left:${x}px; bottom:${y}px; width:20px; height:20px;" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="2" /><circle cx="20" cy="20" r="10" fill="none" stroke="#95a5a6" stroke-width="1" /></svg>`,
+            chalice: (x, y) => `<svg class="decor-item" style="left:${x}px; bottom:${y}px; width:40px; height:60px;" viewBox="0 0 60 100"><path d="M10 10 Q30 5 50 10 L45 50 Q30 60 15 50 Z" fill="#F1C40F" stroke="#D4AC0D" /><rect x="25" y="50" width="10" height="30" fill="#F1C40F" /><ellipse cx="30" cy="85" rx="20" ry="8" fill="#F1C40F" /></svg>`,
+            flower: (x, y) => `<svg class="decor-item" style="left:${x}px; bottom:${y}px; width:30px; height:40px;" viewBox="0 0 50 70"><path d="M25 70 L25 40" stroke="#27AE60" stroke-width="3" /><circle cx="25" cy="30" r="12" fill="#E74C3C" /><circle cx="15" cy="22" r="8" fill="#F1C40F" opacity="0.8" /><circle cx="35" cy="22" r="8" fill="#F1C40F" opacity="0.8" /></svg>`,
+            cross: (x, y, scale) => `<svg class="decor-item" style="left:${x}px; bottom:${y}px; width:${60*scale}px; height:${100*scale}px; opacity:0.4" viewBox="0 0 60 100"><path d="M25 10 L35 10 L35 90 L25 90 Z M10 30 L50 30 L50 40 L10 40 Z" fill="#3E2723" /></svg>`
+        };
+
+        const stepsData = [
+            { 
+                day: "Dimanche des Rameaux", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448542/Dimanche_des_rameaux_ihepng.jpg",
+                desc: "Jésus entre triomphalement à Jérusalem sous les acclamations.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><path d="M50 150 Q100 50 150 150" fill="none" stroke="#4CAF50" stroke-width="4"><animate attributeName="d" values="M50 150 Q100 50 150 150; M50 150 Q100 80 150 150; M50 150 Q100 50 150 150" dur="3s" repeatCount="indefinite" /></path><text x="100" y="180" text-anchor="middle" fill="white" font-size="12">Hosanna !</text></svg>`,
+                event: "L'entrée triomphale de Jésus à Jérusalem sur un âne.",
+                verse: "« Hosanna ! Béni soit celui qui vient au nom du Seigneur ! »",
+                rite: "Procession des Rameaux et tresses de palmes.",
+                hint: "Pensez à l'accueil royal fait de branches et de chants de joie.",
+                sky: "linear-gradient(to bottom, #87CEEB, #E0F2F1)",
+                decorType: 'palm_cloth'
+            },
+            { 
+                day: "Lundi Saint", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448542/Lundi_saint_elkqi2.jpg",
+                desc: "Jésus purifie le Temple et maudit le figuier stérile.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><rect x="70" y="80" width="60" height="40" fill="#8B4513"><animateTransform attributeName="transform" type="rotate" values="0 100 100; 15 100 100; -15 100 100; 0 100 100" dur="0.5s" repeatCount="indefinite" /></rect></svg>`,
+                event: "Jésus purifie le Temple et maudit le figuier stérile.",
+                verse: "« Ma maison sera appelée une maison de prière. »",
+                rite: "Lectures sur la Création et mise en place des voiles noirs.",
+                hint: "Jésus rappelle que Son église est un lieu de communion sacré.",
+                sky: "linear-gradient(to bottom, #7DB9E8, #C9D6FF)",
+                decorType: 'withered'
+            },
+            { 
+                day: "Mardi Saint", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448541/Mardi_saint_a0scnl.jpg",
+                desc: "Jésus parle de la fin des temps et de la vigilance.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><circle cx="100" cy="100" r="10" fill="yellow"><animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></circle></svg>`,
+                event: "Les paraboles sur le Mont des Oliviers concernant le jugement.",
+                verse: "« Veillez donc, car vous ne savez ni le jour ni l'heure. »",
+                rite: "Chant de l'hymne de Pékoueth (À Toi la puissance).",
+                hint: "C'est un jour dédié à la préparation et à l'attente du retour du Christ.",
+                sky: "linear-gradient(to bottom, #4facfe, #00f2fe)",
+                decorType: 'lamp'
+            },
+            { 
+                day: "Mercredi Saint", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448542/Mercredi_saint_dx4hmu.jpg",
+                desc: "La trahison de Judas et le complot contre Jésus.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><circle cx="100" cy="100" r="5" fill="silver" opacity="0.8"><animate attributeName="cy" values="100;150;100" dur="2s" repeatCount="indefinite"/></circle></svg>`,
+                event: "La trahison de Judas pour trente pièces d'argent.",
+                verse: "« Ils lui payèrent trente pièces d'argent. »",
+                rite: "Interdiction de faire le baiser de paix liturgique.",
+                hint: "Rappelez-vous du prix de la trahison dans le jardin de Gethsémané.",
+                sky: "linear-gradient(to bottom, #606c88, #3f4c6b)",
+                decorType: 'coins'
+            },
+            { 
+                day: "Jeudi Saint", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448541/Jeudi_saint_i986xe.jpg",
+                desc: "La Cène et le lavement des pieds des disciples.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><rect x="50" y="140" width="100" height="20" fill="#4facfe" opacity="0.6"/><circle cx="80" cy="120" r="15" fill="#E0AC69"><animateTransform attributeName="transform" type="translate" values="0,0; 40,0; 0,0" dur="2s" repeatCount="indefinite"/></circle></svg>`,
+                event: "L'institution de l'Eucharistie et le lavement des pieds.",
+                verse: "« Si je ne te lave pas, tu n'auras point de part avec moi. »",
+                rite: "Lavage des pieds des fidèles par le prêtre avec l'eau bénie.",
+                hint: "Un acte d'humilité immense avant le partage du pain et du vin.",
+                sky: "linear-gradient(to bottom, #3E5151, #DECBA4)",
+                decorType: 'eucharist'
+            },
+            { 
+                day: "Vendredi Saint", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448541/vendredi_saint_l6rhml.jpg",
+                desc: "Le jour de la Passion et de la Crucifixion.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><path d="M100 40 L100 160 M60 70 L140 70" stroke="#5D4037" stroke-width="8"/><rect x="0" y="0" width="200" height="200" fill="black" opacity="0.3"/></svg>`,
+                event: "La Crucifixion et la mort de Jésus sur la Croix.",
+                verse: "« Père, entre tes mains je remets mon esprit. »",
+                rite: "Les 400 Kirié Eleisson et prosternements collectifs.",
+                hint: "Le moment du sacrifice ultime où tout est accompli.",
+                sky: "linear-gradient(to bottom, #000428, #130000)",
+                decorType: 'passion'
+            },
+            { 
+                day: "Samedi de la Lumière", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448541/Samedi_de_la_lumie%CC%80re_lijv4e.jpg",
+                desc: "La descente aux enfers pour libérer les âmes des justes.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><circle cx="100" cy="100" r="20" fill="white" opacity="0.5"><animate attributeName="r" values="20;50;20" dur="4s" repeatCount="indefinite"/></circle></svg>`,
+                event: "La descente du Christ aux enfers le Samedi Saint.",
+                verse: "« J'étais mort; et voici, je suis vivant aux siècles des siècles. »",
+                rite: "Lecture de l'Apocalypse pendant toute la nuit sainte.",
+                hint: "Le Christ va chercher Adam et Ève et les justes dans le royaume des morts.",
+                sky: "linear-gradient(to bottom, #141E30, #243B55)",
+                decorType: 'light'
+            },
+            { 
+                day: "Dimanche de Pâques", 
+                img: "https://res.cloudinary.com/dx4uwptap/image/upload/v1774448767/dimanche_de_paque_resurrection_smqrmj.jpg",
+                desc: "La Résurrection glorieuse du Christ.",
+                animation: `<svg viewBox="0 0 200 200" class="w-full h-full"><circle cx="100" cy="100" r="40" fill="#FFD700"><animate attributeName="r" values="40;80;40" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/></circle></svg>`,
+                event: "La Résurrection triomphale du Christ d'entre les morts.",
+                verse: "« Il n'est pas ici; il est ressuscité comme il l'avait dit. »",
+                rite: "Grande Procession de la Résurrection et fin du jeûne.",
+                hint: "La mort est vaincue par la Vie ! La lumière jaillit du tombeau.",
+                sky: "linear-gradient(to bottom, #FFD700, #FFFFFF)",
+                decorType: 'easter'
+            }
+        ];
+
+        let state = {
+            currentStep: 0,
+            score: 0,
+            tokens: 0,
+            totalErrors: 0,
+            hintsUsedCount: 0,
+            currentDayAttempts: 0,
+            worldX: 0,
+            walkDir: 0,
+            isInside: false,
+            isEnigma: false,
+            signXPositions: [],
+            buildingXPositions: [],
+            selections: { event: null, verse: null, rite: null }
+        };
+
+        const world = document.getElementById('world-container');
+        const character = document.getElementById('character');
+        const prompt = document.getElementById('interaction-prompt');
+        const sceneOverlay = document.getElementById('scene-overlay');
+        const currentDayLabel = document.getElementById('current-day-label');
+        const scoreDisplay = document.getElementById('score-display');
+        const tokenDisplay = document.getElementById('token-count');
+
+        function initWorld() {
+            let totalWidth = 0;
+            stepsData.forEach((step, i) => {
+                const segment = document.createElement('div');
+                segment.className = 'scenery-segment';
+                
+                // Maison
+                const bx = 150 + Math.random()*200;
+                state.buildingXPositions.push(totalWidth + bx);
+                const building = document.createElement('div');
+                building.className = 'building';
+                building.style.left = bx + 'px';
+                building.style.width = '220px';
+                building.style.height = '280px';
+                building.innerHTML = `<div class="dome" style="top:-90px; left:20px; width:180px; height:180px"></div><div class="arch" style="position:absolute; bottom:0; left:75px; width:70px; height:110px; background:#4A3728; border-radius:35px 35px 0 0"></div>`;
+                segment.appendChild(building);
+
+                // Décorations SVG
+                let decorHTML = '';
+                for(let d=0; d<8; d++) {
+                    const rx = 100 + (d * 120) + (Math.random()*40);
+                    const ry = 10 + (Math.random()*25);
+                    switch(step.decorType) {
+                        case 'palm_cloth':
+                            if(d % 2 === 0) decorHTML += SVG_ASSETS.palm(rx, ry + 110);
+                            else decorHTML += SVG_ASSETS.cloth(rx, ry + 120, ['#e74c3c', '#3498db', '#f1c40f'][d%3]);
+                            break;
+                        case 'coins':
+                            decorHTML += SVG_ASSETS.coin(rx + Math.random()*50, ry + 130);
+                            break;
+                        case 'eucharist':
+                            if(d % 3 === 0) decorHTML += SVG_ASSETS.chalice(rx, ry + 110);
+                            else decorHTML += `<text x="${rx}" y="${450-ry}" font-size="20">🍞</text>`;
+                            break;
+                        case 'passion':
+                            if(d % 3 === 0) decorHTML += SVG_ASSETS.cross(rx, 150, 0.6 + Math.random()*0.4);
+                            break;
+                        case 'easter':
+                            decorHTML += SVG_ASSETS.flower(rx, ry + 115);
+                            break;
+                        case 'withered': decorHTML += `<text x="${rx}" y="${450-ry}" font-size="25">🍂</text>`; break;
+                        case 'light': decorHTML += `<text x="${rx}" y="${450-ry}" font-size="25">🕯️</text>`; break;
+                    }
+                }
+                segment.innerHTML += decorHTML;
+
+                const ground = document.createElement('div');
+                ground.className = 'ground';
+                segment.appendChild(ground);
+
+                // Panneau
+                const signX = totalWidth + 1000;
+                state.signXPositions.push(signX);
+                const sign = document.createElement('div');
+                sign.className = 'absolute bottom-[150px] left-[1000px] flex flex-col items-center z-20';
+                sign.innerHTML = `<img src="${step.img}" class="w-48 h-36 border-4 border-white shadow-xl rounded-lg object-cover"><div class="w-2 h-20 bg-amber-900"></div>`;
+                segment.appendChild(sign);
+
+                world.appendChild(segment);
+                totalWidth += 1200;
+            });
+            
+            const lastSegment = document.createElement('div');
+            lastSegment.className = 'scenery-segment';
+            lastSegment.style.width = '800px';
+            lastSegment.innerHTML = `<div class="ground" style="width:100%"></div>`;
+            world.appendChild(lastSegment);
+
+            currentDayLabel.innerText = "Jour : " + stepsData[0].day;
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop() {
+            if (state.walkDir !== 0 && !state.isInside && !state.isEnigma) {
+                state.worldX -= state.walkDir * 3.5; 
+                if (state.worldX > 0) state.worldX = 0;
+                
+                const totalWorldWidth = (stepsData.length * 1200) + 800;
+                const maxScroll = -(totalWorldWidth - 250); 
+                if (state.worldX < maxScroll) state.worldX = maxScroll;
+
+                world.style.transform = `translateX(${state.worldX}px)`;
+                character.classList.add('walking');
+                character.style.transform = state.walkDir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+
+                checkInteractions();
+            } else {
+                character.classList.remove('walking');
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function checkInteractions() {
+            const playerWorldX = -state.worldX + 150;
+            const nearBuilding = state.buildingXPositions.some((bx, idx) => {
+                const isNear = Math.abs(playerWorldX - (bx + 110)) < 120;
+                return isNear && idx === state.currentStep;
+            });
+            prompt.style.display = nearBuilding ? 'block' : 'none';
+
+            if (state.currentStep < stepsData.length) {
+                const nextSignX = state.signXPositions[state.currentStep];
+                if (Math.abs(playerWorldX - nextSignX) < 40) {
+                    triggerEnigma();
+                }
+            }
+        }
+
+        function triggerScene() {
+            if (prompt.style.display === 'none') return;
+            state.isInside = true;
+            const step = stepsData[state.currentStep];
+            document.getElementById('scene-title').innerText = step.day;
+            document.getElementById('scene-canvas').innerHTML = step.animation;
+            document.getElementById('scene-desc').innerText = step.desc;
+            sceneOverlay.classList.add('active');
+        }
+
+        function closeScene() {
+            sceneOverlay.classList.remove('active');
+            state.isInside = false;
+        }
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function generateChoices(type, correctValue) {
+            const allValues = stepsData.map(s => s[type]);
+            const distractors = allValues.filter(v => v !== correctValue);
+            const selectedDistractors = shuffle([...new Set(distractors)]).slice(0, 2);
+            return shuffle([correctValue, ...selectedDistractors]);
+        }
+
+        function triggerEnigma() {
+            if (state.isEnigma) return;
+            state.walkDir = 0;
+            state.isEnigma = true;
+            state.currentDayAttempts = 0;
+            state.selections = { event: null, verse: null, rite: null };
+            
+            const step = stepsData[state.currentStep];
+            document.getElementById('enigma-title').innerText = "Témoignage : " + step.day;
+            document.getElementById('potential-points').innerText = "3";
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('error-msg').classList.add('hidden');
+            
+            ['event', 'verse', 'rite'].forEach(type => {
+                const container = document.getElementById(`choices-${type}`);
+                container.innerHTML = '';
+                const options = generateChoices(type, step[type]);
+                options.forEach(opt => {
+                    const card = document.createElement('div');
+                    card.className = 'choice-card';
+                    card.innerText = opt;
+                    card.onclick = () => {
+                        Array.from(container.children).forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        state.selections[type] = opt;
+                        updateValidateButton();
+                    };
+                    container.appendChild(card);
+                });
+            });
+            
+            updateValidateButton();
+            document.getElementById('enigma-screen').classList.add('active');
+        }
+
+        function updateValidateButton() {
+            const btn = document.getElementById('btn-validate');
+            btn.disabled = !(state.selections.event && state.selections.verse && state.selections.rite);
+        }
+
+        // Fonction pour passer l'énigme
+        function skipEnigma() {
+            // Ferme la fenêtre d'énigme
+            state.isEnigma = false;
+            document.getElementById('enigma-screen').classList.remove('active');
+
+            // Avance à l'étape suivante sans ajouter de points
+            state.currentStep++;
+
+            if (state.currentStep >= stepsData.length) {
+                showFinalScreen();
+            } else {
+                document.getElementById('game-viewport').style.background = stepsData[state.currentStep].sky;
+                currentDayLabel.innerText = "Jour : " + stepsData[state.currentStep].day;
+                
+                // On donne un petit élan pour sortir de la zone de déclenchement du panneau
+                state.worldX -= 100;
+                world.style.transform = `translateX(${state.worldX}px)`;
+            }
+        }
+
+        function checkEnigma() {
+            const step = stepsData[state.currentStep];
+            const isCorrect = (
+                state.selections.event === step.event && 
+                state.selections.verse === step.verse && 
+                state.selections.rite === step.rite
+            );
+
+            if (isCorrect) {
+                const earned = (state.currentDayAttempts === 0) ? 3 : 1;
+                state.score += earned;
+                state.tokens++;
+                
+                scoreDisplay.innerText = state.score;
+                tokenDisplay.innerText = state.tokens;
+                
+                state.currentStep++;
+                state.isEnigma = false;
+                document.getElementById('enigma-screen').classList.remove('active');
+                
+                if (state.currentStep >= stepsData.length) {
+                    showFinalScreen();
+                } else {
+                    document.getElementById('game-viewport').style.background = stepsData[state.currentStep].sky;
+                    currentDayLabel.innerText = "Jour : " + stepsData[state.currentStep].day;
+                    
+                    // Sortir de la zone de déclenchement
+                    state.worldX -= 100;
+                    world.style.transform = `translateX(${state.worldX}px)`;
+                }
+            } else {
+                state.totalErrors++;
+                state.currentDayAttempts++;
+                
+                const modal = document.getElementById('enigma-modal');
+                modal.classList.add('shake');
+                setTimeout(() => modal.classList.remove('shake'), 500);
+                
+                document.getElementById('error-msg').classList.remove('hidden');
+                document.getElementById('potential-points').innerText = "1";
+                
+                if (state.currentDayAttempts >= 2) {
+                    state.hintsUsedCount++;
+                    const hintBox = document.getElementById('hint-box');
+                    document.getElementById('hint-text').innerText = step.hint;
+                    hintBox.classList.remove('hidden');
+                }
+            }
+        }
+
+        function showFinalScreen() {
+            document.getElementById('final-score').innerText = state.score;
+            document.getElementById('final-tokens').innerText = state.tokens;
+            document.getElementById('final-errors').innerText = state.totalErrors;
+            document.getElementById('final-hints').innerText = state.hintsUsedCount;
+            document.getElementById('finish-screen').classList.add('active');
+        }
+
+        window.addEventListener('keydown', e => {
+            if (state.isInside || state.isEnigma) return;
+            if (e.key === 'ArrowRight') state.walkDir = 1;
+            if (e.key === 'ArrowLeft') state.walkDir = -1;
+            if (e.key === 'ArrowUp') triggerScene();
+        });
+        window.addEventListener('keyup', e => {
+            if (['ArrowRight', 'ArrowLeft'].includes(e.key)) state.walkDir = 0;
+        });
+
+        document.getElementById('btn-walk').onmousedown = () => { if(!state.isInside && !state.isEnigma) state.walkDir = 1; };
+        document.getElementById('btn-back').onmousedown = () => { if(!state.isInside && !state.isEnigma) state.walkDir = -1; };
+        document.getElementById('btn-up').onclick = triggerScene;
+        window.onmouseup = () => state.walkDir = 0;
+
+        document.getElementById('btn-walk').ontouchstart = (e) => { e.preventDefault(); if(!state.isInside && !state.isEnigma) state.walkDir = 1; };
+        document.getElementById('btn-back').ontouchstart = (e) => { e.preventDefault(); if(!state.isInside && !state.isEnigma) state.walkDir = -1; };
+        document.getElementById('btn-walk').ontouchend = () => state.walkDir = 0;
+        document.getElementById('btn-back').ontouchend = () => state.walkDir = 0;
+
+        initWorld();
+    </script>
+</body>
+</html>
