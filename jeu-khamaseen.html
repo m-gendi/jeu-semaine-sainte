@@ -9,7 +9,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #87CEEB; /* Ciel bleu */
+            background-color: #87CEEB;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             touch-action: none;
         }
@@ -218,6 +218,21 @@
             text-align: center;
             overflow-y: auto;
             max-height: 90vh;
+            position: relative;
+        }
+        #btn-exit-quiz {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #b45309;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #btn-exit-quiz:hover {
+            transform: scale(1.2);
         }
         #quiz-title {
             color: #b45309;
@@ -331,8 +346,9 @@
     <!-- Interface du Questionnaire -->
     <div id="quiz-overlay">
         <div id="quiz-container">
+            <button id="btn-exit-quiz" title="Quitter le questionnaire">←</button>
             <h2 id="quiz-title">L'Épreuve du Témoin</h2>
-            <div id="quiz-progress">Question 1 / 5</div>
+            <div id="quiz-progress">Question 1 / 10</div>
             <div id="quiz-question">Question text</div>
             <div id="quiz-options"></div>
             <div id="quiz-feedback"></div>
@@ -355,17 +371,17 @@
                 title: "Entrer dans le Tombeau", quote: "", dogma: "", sources: "", action: "teleport_sepulchre_inside"
             },
             {
-                id: "linen", name: "Les Bandelettes", position: { x: -500, z: -505 }, color: 0xffffff,
+                id: "linen", name: "Les Linges Sacrés", position: { x: -500, z: -501 }, color: 0xffffff,
                 title: "Les linges pliés", quote: "« Il vit les bandes qui étaient à terre, et le linge qu'on avait mis sur la tête de Jésus, non pas avec les bandes, mais plié dans un lieu à part. » (Jean 20:6-7)",
-                dogma: "L'ordre parfait des linges réfute le vol (Jean 20:7). Les voleurs n'auraient pas pris le temps de plier le suaire.",
-                sources: "Bible : Jean 20:6-7.", action: "dialog"
+                dogma: "L'ordre parfait des linges réfute le vol (Jean 20:7). Des voleurs n'auraient pas pris le temps de séparer les bandelettes et de plier le suaire.",
+                sources: "Bible : Jean 20:6-7. Exégèse copte.", action: "dialog"
             },
             {
                 id: "sepulchre_exit", name: "Sortir du Tombeau", position: { x: -500, z: -495 }, color: 0x475569,
                 title: "Sortir", quote: "", dogma: "", sources: "", action: "teleport_sepulchre_outside"
             },
             {
-                id: "emmaus", name: "Disciples d'Emmaüs (Jour 1)", position: { x: 15, z: -28 }, color: 0xd97706,
+                id: "emmaus", name: "Les Disciples d'Emmaüs (Jour 1)", position: { x: 15, z: -25 }, color: 0xd97706,
                 title: "À l'Auberge d'Emmaüs", quote: "« Notre cœur ne brûlait-il pas au dedans de nous, lorsqu'il nous parlait en chemin ? » (Luc 24:32)",
                 dogma: "Le Christ se fait reconnaître à la 'fraction du pain'. Cela fonde la présence réelle dans l'Eucharistie.",
                 sources: "Bible : Luc 24:13-35. Dogme : Mystères Divins.", action: "dialog"
@@ -403,7 +419,7 @@
                 title: "Sortir", quote: "", dogma: "", sources: "", action: "teleport_outside"
             },
             {
-                id: "ascension", name: "L'Ascension (Jour 40)", position: { x: 5, z: -60 }, color: 0x0284c7,
+                id: "ascension", name: "L'Ascension (Jour 40)", position: { x: 25, z: -60 }, color: 0x0284c7,
                 title: "Le Mont des Oliviers", quote: "« Ce Jésus, qui a été enlevé au ciel du milieu de vous, viendra de la même manière. » (Actes 1:11)",
                 dogma: "Procession uniquement dans le sanctuaire à partir de ce jour (symbole de l'entrée au ciel).",
                 sources: "Bible : Actes 1:9-11. Rite Copte.", action: "dialog"
@@ -417,24 +433,24 @@
             {
                 id: "finish_line", name: "Porte de l'Évangélisation (Fin)", position: { x: 0, z: -100 }, color: 0xf59e0b,
                 title: "L'Heure du Témoignage", quote: "« Allez par tout le monde, et prêchez la bonne nouvelle à toute la création. » (Marc 16:15)",
-                dogma: "Les 50 jours sont terminés. Le jeûne des apôtres commence pour préparer la prédication. Il est temps de vérifier si vous avez bien gardé la Parole.",
+                dogma: "Les 50 jours sont terminés. Le jeûne des apôtres commence pour préparer la prédication.",
                 sources: "Bible : Marc 16:15.", action: "start_quiz"
             }
         ];
 
-        // --- DONNÉES DU QUIZ ---
+        // --- DONNÉES DU QUIZ (10 QUESTIONS) ---
         const quizData = [
             {
                 question: "Pendant les 50 jours du Khamaseen, qu'est-il strictement interdit de faire dans l'Église copte orthodoxe ?",
                 options: ["Prier le soir", "Jeûner et faire des métanies (prosternations)", "Lire l'Ancien Testament", "Chanter des louanges"],
                 correctAnswer: 1,
-                explanation: "Exact ! Le Khamaseen est une période de fête continue. L'Église interdit le jeûne et les métanies de pénitence car l'Époux est avec nous."
+                explanation: "Le Khamaseen est une période de fête continue. L'Église interdit le jeûne et les métanies de pénitence car l'Époux est avec nous (Marc 2:19)."
             },
             {
                 question: "Que prouvent dogmatiquement les linges parfaitement pliés trouvés par Jean et Pierre dans le tombeau vide ?",
                 options: ["Que les apôtres ont nettoyé le tombeau", "Que Jésus était pauvre", "Que le corps n'a pas été volé en hâte", "Que les anges portaient ces linges"],
                 correctAnswer: 2,
-                explanation: "Exact. L'ordre parfait réfute la rumeur d'un vol de corps. Des voleurs n'auraient pas pris le temps d'enlever les linges et de plier le suaire à part (Jean 20:7)."
+                explanation: "L'ordre parfait réfute la rumeur d'un vol de corps. Des voleurs n'auraient pas pris le temps de séparer les linges et de plier le suaire à part (Jean 20:7)."
             },
             {
                 question: "Complétez la confession de foi de Saint Thomas le 8ème jour : « Mon Seigneur et mon... »",
@@ -452,7 +468,37 @@
                 question: "Que marque l'office de la Génuflexion (Sajda) célébré le soir de la Pentecôte ?",
                 options: ["La fin définitive des prières de l'année", "Le retour autorisé des prosternations et le don de l'Esprit", "Le début de l'année copte", "La montée de Jésus au ciel"],
                 correctAnswer: 1,
-                explanation: "Après 50 jours d'interdiction, les croyants fléchissent de nouveau les genoux pour adorer la Trinité et le Saint-Esprit qui vient d'être donné."
+                explanation: "Après 50 jours d'interdiction, les croyants fléchissent de nouveau les genoux pour adorer la Trinité et le Saint-Esprit (Livre de la Sajda)."
+            },
+            {
+                question: "Selon l'Évangile, qui est la première personne à avoir vu le Christ ressuscité au matin de Pâques ?",
+                options: ["Saint Pierre", "Saint Jean", "La Vierge Marie", "Marie-Madeleine"],
+                correctAnswer: 3,
+                explanation: "Marie-Madeleine est la première à voir le Christ près du tombeau (Jean 20:14-16) et à annoncer la nouvelle aux apôtres."
+            },
+            {
+                question: "Quelle est la première salutation que le Christ adresse aux disciples dans le Cénacle ?",
+                options: ["« Pourquoi avez-vous peur ? »", "« La paix soit avec vous ! »", "« Je suis revenu. »", "« Repentez-vous ! »"],
+                correctAnswer: 1,
+                explanation: "« La paix soit avec vous ! » (Jean 20:19). C'est le don de la paix divine qui dissipe la crainte des disciples."
+            },
+            {
+                question: "Que faisait le Christ avec les deux disciples sur le chemin d'Emmaüs avant d'être reconnu ?",
+                options: ["Il marchait en silence", "Il leur expliquait les Écritures", "Il leur demandait de l'argent", "Il leur parlait de la fin du monde"],
+                correctAnswer: 1,
+                explanation: "Il leur expliquait dans toutes les Écritures ce qui le concernait (Luc 24:27), préparant leur cœur à la fraction du pain."
+            },
+            {
+                question: "Selon le Credo de Nicée-Constantinople (dogme copte), de qui procède le Saint-Esprit ?",
+                options: ["Du Père seul", "Du Père et du Fils (Filioque)", "Du Fils seul", "Des disciples"],
+                correctAnswer: 0,
+                explanation: "L'Église copte maintient le texte original du Credo (381 ap. J.-C.) : l'Esprit procède du Père seul."
+            },
+            {
+                question: "Dans l'Église copte, comment appelle-t-on le ton liturgique joyeux utilisé durant les 50 jours ?",
+                options: ["Le ton 'Kiahki'", "Le ton 'Hazini' (triste)", "Le ton 'Frayhi' (joyeux)", "Le ton 'Sanaoui' (annuel)"],
+                correctAnswer: 2,
+                explanation: "Le ton 'Frayhi' exprime la joie de la Résurrection et du salut accompli par le Christ."
             }
         ];
 
@@ -462,15 +508,17 @@
             let npcs = [];
             let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false };
             let isDialogActive = false;
+            let isQuizStarted = false;
             let ascensionChrist = null;
             let flames = [];
-            
             const obstacles = [];
-            const speed = 0.22;
+            const baseSpeed = 0.22;
+            const rotationSpeed = 0.05; 
             const interactionDistance = 4;
-
             let currentQuestionIndex = 0;
             let quizScore = 0;
+            
+            let currentLookAt = new THREE.Vector3(0, 12, 0);
 
             init();
             animate();
@@ -478,7 +526,7 @@
             function init() {
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x87CEEB);
-                scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
+                scene.fog = new THREE.Fog(0x87CEEB, 20, 150);
 
                 camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
                 camera.position.set(0, 12, 15);
@@ -495,186 +543,113 @@
                 dirLight.castShadow = true;
                 scene.add(dirLight);
 
-                // --- SOL DE BASE (Sable de Judée) ---
                 const groundMat = new THREE.MeshStandardMaterial({ color: 0xe6c280, roughness: 0.9 });
-                const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), groundMat);
+                const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), groundMat);
                 ground.rotation.x = -Math.PI / 2;
                 ground.receiveShadow = true;
                 scene.add(ground);
 
-                // --- FONCTIONS DE DÉCORATION ---
-                // Créer un patch de sol texturé (couleur)
-                function createGroundPatch(x, z, w, d, colorHex) {
+                function createGroundPatch(x, z, w, d, colorHex, yOffset = 0.02) {
                     const patchMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 1.0 });
                     const patch = new THREE.Mesh(new THREE.PlaneGeometry(w, d), patchMat);
                     patch.rotation.x = -Math.PI / 2;
-                    patch.position.set(x, 0.02, z); // Légèrement au-dessus pour éviter le Z-fighting
+                    patch.position.set(x, yOffset, z);
                     patch.receiveShadow = true;
                     scene.add(patch);
                 }
 
-                // Créer un arbre (Olivier)
                 function createOliveTree(x, z) {
-                    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3b2c }); // Tronc noueux sombre
-                    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2.5), trunkMat);
+                    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2.5), new THREE.MeshStandardMaterial({ color: 0x4a3b2c }));
                     trunk.position.set(x, 1.25, z);
-                    
-                    const leavesMat = new THREE.MeshStandardMaterial({ color: 0x556b2f }); // Vert olive terne
-                    // Une canopée un peu plus large
-                    const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(1.8, 1), leavesMat);
+                    const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(1.8, 1), new THREE.MeshStandardMaterial({ color: 0x556b2f }));
                     leaves.position.set(x, 3, z);
-                    
-                    trunk.castShadow = true;
-                    leaves.castShadow = true;
+                    trunk.castShadow = true; leaves.castShadow = true;
                     scene.add(trunk, leaves);
                 }
 
-                // Créer un buisson
-                function createBush(x, z, size = 1) {
-                    const bushMat = new THREE.MeshStandardMaterial({ color: 0x228b22 }); // Vert forêt
-                    const bush = new THREE.Mesh(new THREE.DodecahedronGeometry(size, 0), bushMat);
-                    bush.position.set(x, size/2, z);
-                    bush.castShadow = true;
-                    scene.add(bush);
-                }
-
-                // Créer un rocher
-                function createRock(x, z, size = 0.5) {
-                    const rockMat = new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.9 });
-                    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(size, 0), rockMat);
+                function createRock(x, z, size = 0.5, color = 0x78716c) {
+                    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(size, 0), new THREE.MeshStandardMaterial({ color: color }));
                     rock.position.set(x, size/2, z);
                     rock.rotation.set(Math.random(), Math.random(), Math.random());
                     rock.castShadow = true;
                     scene.add(rock);
+                    return rock;
                 }
 
                 const rockMat = new THREE.MeshStandardMaterial({ color: 0x78716c });
 
-                // --- 1. LE JARDIN DU TOMBEAU (Jean 19:41) ---
-                // Sol vert (Jardin)
-                createGroundPatch(-15, -10, 25, 25, 0x4d7c0f);
-                
-                // Le Sépulcre
+                // --- DÉCORS ---
+                createGroundPatch(-15, -10, 30, 30, 0x4d7c0f, 0.01);
                 createBuilding(-15, -15, 12, 6, 10, rockMat);
-                obstacles.push({ minX: -21, maxX: -9, minZ: -20, maxZ: -10 });
+                obstacles.push({ minX: -21.5, maxX: -8.5, minZ: -20.5, maxZ: -9.5 });
                 
                 const stone = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 0.5, 16), rockMat);
-                stone.rotation.x = Math.PI / 2;
-                stone.position.set(-12, 2, -9);
-                stone.castShadow = true;
-                scene.add(stone);
+                stone.rotation.x = Math.PI / 2; stone.position.set(-12, 2, -9); scene.add(stone);
 
-                // Végétation et rochers du jardin
-                createBush(-20, -5, 1.2);
-                createBush(-22, -15, 1.5);
-                createBush(-8, -12, 1);
-                createRock(-10, -5, 0.6);
-                createRock(-18, -2, 0.4);
-
-                // --- 2. LE CHEMIN D'EMMAÜS ---
-                // Route de terre battue vers l'auberge
-                createGroundPatch(15, -15, 6, 30, 0xa16207); // Chemin marron
-                
+                createGroundPatch(15, -15, 8, 40, 0xa16207, 0.015);
                 const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-                createBuilding(15, -30, 8, 5, 6, new THREE.MeshStandardMaterial({ color: 0x94a3b8 })); 
-                obstacles.push({ minX: 11, maxX: 19, minZ: -33, maxZ: -27 });
-                
-                const emmRoof = new THREE.Mesh(new THREE.BoxGeometry(9, 0.5, 7), woodMat);
-                emmRoof.position.set(15, 5, -30);
-                scene.add(emmRoof);
+                createBuilding(15, -32, 10, 5, 8, new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
+                obstacles.push({ minX: 9.5, maxX: 20.5, minZ: -36.5, maxZ: -27.5 });
+                const emmRoof = new THREE.Mesh(new THREE.BoxGeometry(11, 0.5, 10), woodMat); emmRoof.position.set(15, 5, -30); scene.add(emmRoof);
+                const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 3), woodMat); tableTop.position.set(15, 1.5, -27); scene.add(tableTop);
+                const bread = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2), new THREE.MeshStandardMaterial({ color: 0xf59e0b })); bread.position.set(15, 1.7, -27); scene.add(bread);
 
-                const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 3), woodMat);
-                tableTop.position.set(15, 1.5, -28);
-                const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 1.5), woodMat);
-                tableLeg.position.set(15, 0.75, -28);
-                scene.add(tableTop, tableLeg);
-                
-                const bread = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
-                bread.position.set(15, 1.7, -28);
-                scene.add(bread);
-
-                createBush(10, -25, 0.8);
-                createRock(18, -20, 0.5);
-
-                // --- 3. JÉRUSALEM (Maison du Cénacle & Pentecôte) ---
-                // Parvis pavé (Gris)
-                createGroundPatch(-5, -55, 30, 60, 0x9ca3af);
-
+                createGroundPatch(-5, -55, 35, 50, 0x9ca3af, 0.01);
                 const houseMat = new THREE.MeshStandardMaterial({ color: 0xebd5b3 });
                 createBuilding(-10, -38, 8, 7, 6, houseMat);
-                obstacles.push({ minX: -14, maxX: -6, minZ: -41, maxZ: -35 });
-                
-                const roof = new THREE.Mesh(new THREE.BoxGeometry(9, 0.5, 7), new THREE.MeshStandardMaterial({ color: 0x5c4033 }));
-                roof.position.set(-10, 7, -38);
-                scene.add(roof);
+                obstacles.push({ minX: -14.5, maxX: -5.5, minZ: -41.5, maxZ: -34.5 });
+                const roof = new THREE.Mesh(new THREE.BoxGeometry(9, 0.5, 7), new THREE.MeshStandardMaterial({ color: 0x5c4033 })); roof.position.set(-10, 7, -38); scene.add(roof);
 
-                // Décorations de la ville (piliers, petits murets)
-                createBuilding(5, -45, 15, 1, 1, new THREE.MeshStandardMaterial({ color: 0x64748b }));
-                createBuilding(-15, -55, 1, 1, 15, new THREE.MeshStandardMaterial({ color: 0x64748b }));
+                createGroundPatch(25, -75, 25, 45, 0x65a30d, 0.015);
+                for(let i=0; i<8; i++) createOliveTree(18 + Math.random()*15, -55 - Math.random()*25);
 
-                // --- 4. LE MONT DES OLIVIERS (Actes 1:12) ---
-                // Sol en herbe
-                createGroundPatch(15, -60, 25, 25, 0x65a30d);
-                
-                createOliveTree(8, -55);
-                createOliveTree(18, -62);
-                createOliveTree(12, -68);
-                createOliveTree(20, -58);
-                
-                createRock(10, -60, 0.8);
-                createRock(15, -58, 0.5);
-                createBush(14, -65, 1.2);
-
-                // L'Arche d'Or (Ligne d'arrivée)
                 const archMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
-                const pillar1 = new THREE.Mesh(new THREE.BoxGeometry(1, 8, 1), archMat);
-                pillar1.position.set(-4, 4, -100);
-                const pillar2 = new THREE.Mesh(new THREE.BoxGeometry(1, 8, 1), archMat);
-                pillar2.position.set(4, 4, -100);
-                const archTop = new THREE.Mesh(new THREE.BoxGeometry(9, 1, 1), archMat);
-                archTop.position.set(0, 8.5, -100);
+                const pillar1 = new THREE.Mesh(new THREE.BoxGeometry(1, 8, 1), archMat); pillar1.position.set(-4, 4, -100);
+                const pillar2 = new THREE.Mesh(new THREE.BoxGeometry(1, 8, 1), archMat); pillar2.position.set(4, 4, -100);
+                const archTop = new THREE.Mesh(new THREE.BoxGeometry(9, 1, 1), archMat); archTop.position.set(0, 8.5, -100);
                 scene.add(pillar1, pillar2, archTop);
 
-
-                // --- INTÉRIEURS (Hors de la carte principale) ---
-                // Sépulcre Intérieur
+                // --- INTERIEURS ---
                 const sepulchreGroup = new THREE.Group();
-                const sepFloor = new THREE.Mesh(new THREE.PlaneGeometry(15, 15), rockMat);
-                sepFloor.rotation.x = -Math.PI / 2;
-                sepulchreGroup.add(sepFloor);
-                const wallGeoH = new THREE.BoxGeometry(15, 5, 1);
-                const wallGeoV = new THREE.BoxGeometry(1, 5, 15);
-                const w1 = new THREE.Mesh(wallGeoH, rockMat); w1.position.set(0, 2.5, -7.5);
-                const w2 = new THREE.Mesh(wallGeoH, rockMat); w2.position.set(0, 2.5, 7.5);
-                const w3 = new THREE.Mesh(wallGeoV, rockMat); w3.position.set(-7.5, 2.5, 0);
-                const w4 = new THREE.Mesh(wallGeoV, rockMat); w4.position.set(7.5, 2.5, 0);
-                sepulchreGroup.add(w1, w2, w3, w4);
-                const stoneBed = new THREE.Mesh(new THREE.BoxGeometry(6, 1, 3), rockMat);
-                stoneBed.position.set(0, 0.5, -4);
+                const darkRockMat = new THREE.MeshStandardMaterial({ color: 0x44403c });
+                const sepFloor = new THREE.Mesh(new THREE.PlaneGeometry(15, 15), darkRockMat); sepFloor.rotation.x = -Math.PI / 2; sepulchreGroup.add(sepFloor);
+                for(let i=0; i<15; i++) {
+                    const r = createRock(0, 0, 3 + Math.random()*2, 0x292524);
+                    const angle = (i/15) * Math.PI * 2; r.position.set(Math.cos(angle)*7.5, 2.5, Math.sin(angle)*7.5); sepulchreGroup.add(r);
+                }
+                
+                // --- POSITION AMELIOREE DU TOMBEAU (Écarté du mur) ---
+                const stoneBed = new THREE.Mesh(new THREE.BoxGeometry(6, 1.2, 3), new THREE.MeshStandardMaterial({color: 0x57534e})); 
+                stoneBed.position.set(0, 0.6, -1); // Déplacé de -4 à -1 pour l'éloigner du mur du fond
                 sepulchreGroup.add(stoneBed);
-                sepulchreGroup.position.set(-500, 0, -500);
-                scene.add(sepulchreGroup);
+                
+                const linens = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 1.5), new THREE.MeshStandardMaterial({color: 0xffffff})); 
+                linens.position.set(-1, 1.25, -1); // Déplacé de -4 à -1
+                sepulchreGroup.add(linens);
+                
+                const suaire = new THREE.Mesh(new THREE.BoxGeometry(1, 0.4, 1), new THREE.MeshStandardMaterial({color: 0xf8fafc})); 
+                suaire.position.set(2, 1.4, -1); // Déplacé de -4 à -1
+                sepulchreGroup.add(suaire);
 
-                // Cénacle Intérieur
+                // Éclairage focalisé sur le nouveau centre
+                const sepSpot = new THREE.SpotLight(0xffffff, 1.5, 20);
+                sepSpot.position.set(0, 4, -1);
+                sepSpot.target = stoneBed;
+                sepulchreGroup.add(sepSpot);
+
+                sepulchreGroup.position.set(-500, 0, -500); scene.add(sepulchreGroup);
+
                 const cenacleGroup = new THREE.Group();
-                const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x5c4033 }));
-                floor.rotation.x = -Math.PI / 2;
-                cenacleGroup.add(floor);
-                const cenacleWallMat = new THREE.MeshStandardMaterial({ color: 0xebd5b3 });
-                const wallN = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), cenacleWallMat); wallN.position.set(0, 5, -15);
-                const wallS = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), cenacleWallMat); wallS.position.set(0, 5, 15);
-                const wallE = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), cenacleWallMat); wallE.position.set(15, 5, 0);
-                const wallW = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), cenacleWallMat); wallW.position.set(-15, 5, 0);
+                const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x5c4033 })); floor.rotation.x = -Math.PI / 2; cenacleGroup.add(floor);
+                const wallN = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), houseMat); wallN.position.set(0, 5, -15);
+                const wallS = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), houseMat); wallS.position.set(0, 5, 15);
+                const wallE = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), houseMat); wallE.position.set(15, 5, 0);
+                const wallW = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), houseMat); wallW.position.set(-15, 5, 0);
                 cenacleGroup.add(wallN, wallS, wallE, wallW);
-                const christ = createHuman(0xffffff, true);
-                christ.position.set(0, 0, -10);
-                cenacleGroup.add(christ);
-                cenacleGroup.position.set(500, 0, 500);
-                scene.add(cenacleGroup);
+                const christ = createHuman(0xffffff, true); christ.position.set(0, 0, -10); cenacleGroup.add(christ);
+                cenacleGroup.position.set(500, 0, 500); scene.add(cenacleGroup);
 
-                // --- JOUEUR ET NPCs ---
-                player = createHuman(0x3b82f6);
-                scene.add(player);
+                player = createHuman(0x3b82f6); scene.add(player);
 
                 npcData.forEach(data => {
                     let npcMesh;
@@ -682,105 +657,70 @@
                         npcMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.5, 0.2), new THREE.MeshStandardMaterial({ color: data.color }));
                         npcMesh.position.set(data.position.x, 1.25, data.position.z);
                     } else if (data.id === "linen") {
-                        npcMesh = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.1, 1), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+                        npcMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 0.1, 2), new THREE.MeshBasicMaterial({ visible: false }));
                         npcMesh.position.set(data.position.x, 1.05, data.position.z);
                     } else if (data.id === "ascension") {
-                        // Position mise à jour pour correspondre au Mont des Oliviers
-                        ascensionChrist = createHuman(0xffffff, true);
-                        npcMesh = ascensionChrist;
-                        npcMesh.position.set(data.position.x, 0, data.position.z);
+                        ascensionChrist = createHuman(0xffffff, true); npcMesh = ascensionChrist; npcMesh.position.set(data.position.x, 0, data.position.z);
                         const cloud = new THREE.Mesh(new THREE.SphereGeometry(3), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 }));
-                        cloud.position.set(data.position.x, 6, data.position.z);
-                        scene.add(cloud);
+                        cloud.position.set(data.position.x, 6, data.position.z); scene.add(cloud);
                     } else if (data.id === "pentecost") {
-                        npcMesh = createHuman(data.color);
-                        npcMesh.position.set(data.position.x, 0, data.position.z);
-                        const fGeo = new THREE.ConeGeometry(0.2, 0.6, 8);
-                        const fMat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
-                        const mF = new THREE.Mesh(fGeo, fMat);
-                        mF.position.set(data.position.x, 8, data.position.z);
-                        scene.add(mF); flames.push(mF);
+                        npcMesh = createHuman(data.color); npcMesh.position.set(data.position.x, 0, data.position.z);
+                        const fGeo = new THREE.ConeGeometry(0.2, 0.6, 8); const fMat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
+                        const mF = new THREE.Mesh(fGeo, fMat); mF.position.set(data.position.x, 8, data.position.z); scene.add(mF); flames.push(mF);
                         [{x: -2, z: 0}, {x: 2, z: 0}].forEach(off => {
-                            const disc = createHuman(0x64748b);
-                            disc.position.set(data.position.x + off.x, 0, data.position.z + off.z);
-                            scene.add(disc);
-                            const f = new THREE.Mesh(fGeo, fMat);
-                            f.position.set(data.position.x + off.x, 8 + Math.random(), data.position.z + off.z);
-                            scene.add(f); flames.push(f);
+                            const disc = createHuman(0x64748b); disc.position.set(data.position.x + off.x, 0, data.position.z + off.z); scene.add(disc);
+                            const f = new THREE.Mesh(fGeo, fMat); f.position.set(data.position.x + off.x, 8 + Math.random(), data.position.z + off.z); scene.add(f); flames.push(f);
                         });
+                    } else if (data.id === "emmaus") {
+                        npcMesh = createHuman(data.color); npcMesh.position.set(data.position.x - 1.5, 0, data.position.z);
+                        const disc2 = createHuman(0xb45309); disc2.position.set(data.position.x + 1.5, 0, data.position.z); scene.add(disc2);
                     } else if (data.id === "finish_line") {
                         npcMesh = new THREE.Mesh(new THREE.BoxGeometry(6, 1, 1), new THREE.MeshBasicMaterial({ visible: false }));
                         npcMesh.position.set(data.position.x, 0, data.position.z);
-                    } else {
-                        npcMesh = createHuman(data.color);
-                        npcMesh.position.set(data.position.x, 0, data.position.z);
-                    }
+                    } else { npcMesh = createHuman(data.color); npcMesh.position.set(data.position.x, 0, data.position.z); }
                     scene.add(npcMesh);
-                    
-                    const label = document.createElement('div');
-                    label.className = 'npc-label';
-                    label.textContent = data.name;
-                    document.getElementById('ui-layer').appendChild(label);
-                    npcs.push({ mesh: npcMesh, data: data, label: label });
+                    const label = document.createElement('div'); label.className = 'npc-label'; label.textContent = data.name;
+                    document.getElementById('ui-layer').appendChild(label); npcs.push({ mesh: npcMesh, data: data, label: label });
                 });
 
-                window.addEventListener('keydown', (e) => {
-                    if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
-                    if (e.key === ' ' && !isDialogActive) checkForInteraction();
-                });
+                window.addEventListener('keydown', (e) => { if (keys.hasOwnProperty(e.key)) keys[e.key] = true; if (e.key === ' ' && !isDialogActive) checkForInteraction(); });
                 window.addEventListener('keyup', (e) => { if (keys.hasOwnProperty(e.key)) keys[e.key] = false; });
                 setupTouchControls('btn-up', 'ArrowUp'); setupTouchControls('btn-down', 'ArrowDown');
                 setupTouchControls('btn-left', 'ArrowLeft'); setupTouchControls('btn-right', 'ArrowRight');
                 document.getElementById('btn-close-dialog').addEventListener('click', closeDialog);
-                
-                document.getElementById('quiz-next-btn').addEventListener('click', () => {
-                    currentQuestionIndex++;
-                    loadQuizQuestion();
-                });
-                document.getElementById('quiz-restart-btn').addEventListener('click', () => {
-                    location.reload(); 
-                });
-
+                document.getElementById('quiz-next-btn').addEventListener('click', () => { currentQuestionIndex++; loadQuizQuestion(); });
+                document.getElementById('quiz-restart-btn').addEventListener('click', () => { location.reload(); });
+                document.getElementById('btn-exit-quiz').addEventListener('click', closeQuiz);
                 window.addEventListener('resize', onWindowResize);
             }
 
             function createHuman(c, glow = false) {
-                const g = new THREE.Group();
-                const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c });
-                const b = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.6, 1.5, 16), m);
-                b.position.y = 0.75; b.castShadow = !glow;
+                const g = new THREE.Group(); const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c });
+                const b = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.6, 1.5, 16), m); b.position.y = 0.75; b.castShadow = !glow;
                 const h = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69 }));
-                h.position.y = 1.7; h.castShadow = !glow;
-                g.add(b, h); return g;
+                h.position.y = 1.7; h.castShadow = !glow; g.add(b, h); return g;
             }
 
             function setupTouchControls(id, k) {
-                const el = document.getElementById(id);
-                const act = (v) => (e) => { e.preventDefault(); keys[k] = v; };
+                const el = document.getElementById(id); const act = (v) => (e) => { e.preventDefault(); keys[k] = v; };
                 el.addEventListener('touchstart', act(true)); el.addEventListener('touchend', act(false));
                 el.addEventListener('mousedown', act(true)); el.addEventListener('mouseup', act(false));
             }
 
             function createBuilding(x, z, w, h, d, mat) {
-                const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                b.position.set(x, h/2, z); b.castShadow = true; b.receiveShadow = true;
-                scene.add(b);
-                return b;
+                const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); b.position.set(x, h/2, z); b.castShadow = true; b.receiveShadow = true;
+                scene.add(b); return b;
             }
 
-            function onWindowResize() {
-                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            }
+            function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
 
             function checkForInteraction() {
-                let closest = null;
-                let minD = interactionDistance;
+                let closest = null; let minD = interactionDistance;
                 npcs.forEach(npc => {
+                    if (npc.data.id === "finish_line") return;
                     if (Math.abs(player.position.x - npc.data.position.x) < 50 && Math.abs(player.position.z - npc.data.position.z) < 50) {
                         const pos = (npc.data.id === 'ascension') ? new THREE.Vector3(npc.data.position.x, 0, npc.data.position.z) : npc.mesh.position;
-                        const d = player.position.distanceTo(pos);
-                        if (d < minD) { minD = d; closest = npc; }
+                        const d = player.position.distanceTo(pos); if (d < minD) { minD = d; closest = npc; }
                     }
                 });
                 if (closest) openDialog(closest.data);
@@ -791,45 +731,38 @@
                 if (d.action === "teleport_outside") { teleportPlayer(-10, -32); return; }
                 if (d.action === "teleport_sepulchre_inside") { teleportPlayer(-500, -493); return; }
                 if (d.action === "teleport_sepulchre_outside") { teleportPlayer(-15, -5); return; }
-                
-                if (d.action === "start_quiz") {
-                    startQuiz();
-                    return;
-                }
-
-                isDialogActive = true;
-                for (let k in keys) keys[k] = false;
-                document.getElementById('dialog-title').innerText = d.title;
-                document.getElementById('dialog-quote').innerText = d.quote;
-                document.getElementById('dialog-dogma').innerText = d.dogma;
-                document.getElementById('dialog-sources').innerText = "Sources : " + d.sources;
-                document.getElementById('dialog-box').classList.add('active');
-                document.getElementById('interaction-hint').style.display = 'none';
+                if (d.action === "start_quiz") { startQuiz(); return; }
+                isDialogActive = true; for (let k in keys) keys[k] = false;
+                document.getElementById('dialog-title').innerText = d.title; document.getElementById('dialog-quote').innerText = d.quote;
+                document.getElementById('dialog-dogma').innerText = d.dogma; document.getElementById('dialog-sources').innerText = "Sources : " + d.sources;
+                document.getElementById('dialog-box').classList.add('active'); document.getElementById('interaction-hint').style.display = 'none';
             }
 
             function closeDialog() { isDialogActive = false; document.getElementById('dialog-box').classList.remove('active'); }
 
             function teleportPlayer(tx, tz) {
-                const o = document.getElementById('fade-overlay');
-                o.style.opacity = '1'; isDialogActive = true;
+                const o = document.getElementById('fade-overlay'); o.style.opacity = '1'; isDialogActive = true;
                 setTimeout(() => {
                     player.position.set(tx, 0, tz);
-                    camera.position.x = tx; camera.position.z = tz + 15; camera.lookAt(player.position);
+                    if (tx < -400) { player.rotation.y = Math.PI; camera.position.set(tx, 1.7, tz); currentLookAt.set(tx, 1.7, tz - 5); camera.lookAt(currentLookAt); }
+                    else { camera.position.set(tx, 12, tz + 15); camera.lookAt(player.position); }
                     setTimeout(() => { o.style.opacity = '0'; isDialogActive = false; }, 500);
                 }, 1000);
             }
 
-            // --- QUIZ ---
             function startQuiz() {
-                isDialogActive = true; 
-                for (let k in keys) keys[k] = false;
-                
+                if (isQuizStarted) return;
+                isQuizStarted = true; isDialogActive = true; for (let k in keys) keys[k] = false;
                 document.getElementById('ui-layer').style.display = 'none';
                 document.getElementById('quiz-overlay').style.display = 'flex';
-                
-                currentQuestionIndex = 0;
-                quizScore = 0;
-                loadQuizQuestion();
+                currentQuestionIndex = 0; quizScore = 0; loadQuizQuestion();
+            }
+
+            function closeQuiz() {
+                isQuizStarted = false; isDialogActive = false;
+                document.getElementById('quiz-overlay').style.display = 'none';
+                document.getElementById('ui-layer').style.display = 'flex';
+                player.position.z += 5;
             }
 
             function loadQuizQuestion() {
@@ -837,23 +770,12 @@
                 const feedbackDiv = document.getElementById('quiz-feedback');
                 const nextBtn = document.getElementById('quiz-next-btn');
                 const optionsDiv = document.getElementById('quiz-options');
-                
-                feedbackDiv.style.display = 'none';
-                nextBtn.style.display = 'none';
-                optionsDiv.innerHTML = '';
-                
-                if (currentQuestionIndex >= quizData.length) {
-                    showFinalScore();
-                    return;
-                }
-
+                feedbackDiv.style.display = 'none'; nextBtn.style.display = 'none'; optionsDiv.innerHTML = '';
+                if (currentQuestionIndex >= quizData.length) { showFinalScore(); return; }
                 document.getElementById('quiz-progress').innerText = `Question ${currentQuestionIndex + 1} / ${quizData.length}`;
                 document.getElementById('quiz-question').innerText = questionData.question;
-
                 questionData.options.forEach((optText, index) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'quiz-option';
-                    btn.innerText = optText;
+                    const btn = document.createElement('button'); btn.className = 'quiz-option'; btn.innerText = optText;
                     btn.onclick = () => handleAnswer(index, questionData.correctAnswer, questionData.explanation);
                     optionsDiv.appendChild(btn);
                 });
@@ -863,25 +785,10 @@
                 const buttons = document.querySelectorAll('.quiz-option');
                 const feedbackDiv = document.getElementById('quiz-feedback');
                 const nextBtn = document.getElementById('quiz-next-btn');
-
                 buttons.forEach(btn => btn.disabled = true);
-
-                if (selectedIndex === correctIndex) {
-                    buttons[selectedIndex].classList.add('correct');
-                    quizScore++;
-                    feedbackDiv.innerHTML = `<strong>Excellente réponse !</strong><br>${explanation}`;
-                    feedbackDiv.style.background = "#dcfce7";
-                    feedbackDiv.style.color = "#166534";
-                } else {
-                    buttons[selectedIndex].classList.add('wrong');
-                    buttons[correctIndex].classList.add('correct');
-                    feedbackDiv.innerHTML = `<strong>Erreur !</strong><br>${explanation}`;
-                    feedbackDiv.style.background = "#fee2e2";
-                    feedbackDiv.style.color = "#991b1b";
-                }
-
-                feedbackDiv.style.display = 'block';
-                nextBtn.style.display = 'inline-block';
+                if (selectedIndex === correctIndex) { buttons[selectedIndex].classList.add('correct'); quizScore++; feedbackDiv.innerHTML = `<strong>Excellente réponse !</strong><br>${explanation}`; feedbackDiv.style.background = "#dcfce7"; feedbackDiv.style.color = "#166534"; }
+                else { buttons[selectedIndex].classList.add('wrong'); buttons[correctIndex].classList.add('correct'); feedbackDiv.innerHTML = `<strong>Erreur !</strong><br>${explanation}`; feedbackDiv.style.background = "#fee2e2"; feedbackDiv.style.color = "#991b1b"; }
+                feedbackDiv.style.display = 'block'; nextBtn.style.display = 'inline-block';
             }
 
             function showFinalScore() {
@@ -890,20 +797,9 @@
                 document.getElementById('quiz-options').innerHTML = '';
                 document.getElementById('quiz-feedback').style.display = 'none';
                 document.getElementById('quiz-next-btn').style.display = 'none';
-                
                 const questionDiv = document.getElementById('quiz-question');
-                let message = "";
-                
-                if (quizScore === quizData.length) {
-                    message = "Parfait ! Vous avez gardé la Parole et connaissez parfaitement les mystères du Khamaseen.";
-                } else if (quizScore >= 3) {
-                    message = "Très bien ! Vous êtes un bon témoin de la Résurrection.";
-                } else {
-                    message = "Il y a encore des choses à apprendre sur le dogme. N'hésitez pas à refaire le pèlerinage !";
-                }
-
+                let message = quizScore >= 7 ? "Parfait ! Vous êtes un excellent témoin des Khamaseen." : "Très bien ! N'hésitez pas à relire les sources pour parfaire vos connaissances.";
                 questionDiv.innerHTML = `<span style="font-size:3rem; display:block; color:#b45309;">${quizScore} / ${quizData.length}</span><br>${message}`;
-                
                 document.getElementById('quiz-restart-btn').style.display = 'inline-block';
             }
 
@@ -916,11 +812,8 @@
                         d = player.position.distanceTo(pos);
                     }
                     if (d < interactionDistance) near = true;
-
                     const v = npc.mesh.position.clone();
-                    v.y += (npc.data.id === 'pentecost') ? 3.8 : 2.2;
-                    if (npc.data.id === 'finish_line') v.y += 2.0; 
-                    
+                    v.y += (npc.data.id === 'pentecost') ? 3.8 : 2.2; if (npc.data.id === 'finish_line') v.y += 2.0; 
                     v.project(camera);
                     const x = (v.x * .5 + .5) * window.innerWidth;
                     const y = (v.y * -.5 + .5) * window.innerHeight;
@@ -934,49 +827,54 @@
                 if (Math.abs(x) > 400) return false;
                 const margin = 0.5;
                 for (let obs of obstacles) {
-                    if (x + margin > obs.minX && x - margin < obs.maxX &&
-                        z + margin > obs.minZ && z - margin < obs.maxZ) {
-                        return true;
-                    }
+                    if (x + margin > obs.minX && x - margin < obs.maxX && z + margin > obs.minZ && z - margin < obs.maxZ) return true;
                 }
                 return false;
             }
 
             function animate() {
                 requestAnimationFrame(animate);
-                if (!isDialogActive) {
-                    let nextX = player.position.x;
-                    let nextZ = player.position.z;
-                    
-                    if (keys.ArrowUp || keys.w) { nextZ -= speed; player.rotation.y = Math.PI; }
-                    if (keys.ArrowDown || keys.s) { nextZ += speed; player.rotation.y = 0; }
-                    if (keys.ArrowLeft || keys.a) { nextX -= speed; player.rotation.y = -Math.PI / 2; }
-                    if (keys.ArrowRight || keys.d) { nextX += speed; player.rotation.y = Math.PI / 2; }
+                const inSepulchre = player.position.x < -400;
+                const inCenacle = player.position.x > 400;
+                const currentSpeed = inSepulchre ? baseSpeed * 0.25 : baseSpeed;
 
-                    if (!checkCollision(nextX, nextZ)) {
-                        player.position.x = nextX;
-                        player.position.z = nextZ;
+                if (!isDialogActive && !isQuizStarted) {
+                    if (inSepulchre) {
+                        if (keys.ArrowLeft || keys.a) player.rotation.y += rotationSpeed;
+                        if (keys.ArrowRight || keys.d) player.rotation.y -= rotationSpeed;
+                        let moveDir = 0; if (keys.ArrowUp || keys.w) moveDir = 1; if (keys.ArrowDown || keys.s) moveDir = -1;
+                        if (moveDir !== 0) {
+                            let nextX = player.position.x + Math.sin(player.rotation.y) * currentSpeed * moveDir;
+                            let nextZ = player.position.z + Math.cos(player.rotation.y) * currentSpeed * moveDir;
+                            if (nextX > -507 && nextX < -493 && nextZ > -507 && nextZ < -492) { player.position.x = nextX; player.position.z = nextZ; }
+                        }
+                    } else {
+                        let nextX = player.position.x; let nextZ = player.position.z;
+                        if (keys.ArrowUp || keys.w) { nextZ -= currentSpeed; player.rotation.y = Math.PI; }
+                        if (keys.ArrowDown || keys.s) { nextZ += currentSpeed; player.rotation.y = 0; }
+                        if (keys.ArrowLeft || keys.a) { nextX -= currentSpeed; player.rotation.y = -Math.PI / 2; }
+                        if (keys.ArrowRight || keys.d) { nextX += currentSpeed; player.rotation.y = Math.PI / 2; }
+                        if (!checkCollision(nextX, nextZ)) { player.position.x = nextX; player.position.z = nextZ; }
                     }
+                    if (player.position.distanceTo(new THREE.Vector3(0, 0, -100)) < 2.5) startQuiz();
                 }
 
-                if (player.position.x > 400) {
-                    player.position.x = Math.max(486, Math.min(514, player.position.x));
-                    player.position.z = Math.max(486, Math.min(514, player.position.z));
-                } else if (player.position.x < -400) {
-                    player.position.x = Math.max(-506, Math.min(-494, player.position.x));
-                    player.position.z = Math.max(-506, Math.min(-494, player.position.z));
+                if (inSepulchre) {
+                    player.visible = false; camera.position.copy(player.position); camera.position.y = 1.7;
+                    const targetLookAt = new THREE.Vector3(player.position.x + Math.sin(player.rotation.y) * 5, 1.7, player.position.z + Math.cos(player.rotation.y) * 5);
+                    currentLookAt.lerp(targetLookAt, 0.1); camera.lookAt(currentLookAt);
+                } else if (inCenacle) {
+                    player.visible = true; player.position.x = Math.max(486, Math.min(514, player.position.x)); player.position.z = Math.max(486, Math.min(514, player.position.z));
+                    camera.position.x += (player.position.x - camera.position.x) * 0.1; camera.position.y += (12 - camera.position.y) * 0.1;
+                    camera.position.z += (player.position.z + 15 - camera.position.z) * 0.1; camera.lookAt(player.position);
                 } else {
-                    player.position.x = Math.max(-95, Math.min(95, player.position.x));
-                    player.position.z = Math.max(-110, Math.min(145, player.position.z));
+                    player.visible = true; player.position.x = Math.max(-95, Math.min(95, player.position.x)); player.position.z = Math.max(-110, Math.min(145, player.position.z));
+                    camera.position.x += (player.position.x - camera.position.x) * 0.1; camera.position.y += (12 - camera.position.y) * 0.1;
+                    camera.position.z += (player.position.z + 15 - camera.position.z) * 0.1; camera.lookAt(player.position);
                 }
-
-                camera.position.x += (player.position.x - camera.position.x) * 0.1;
-                camera.position.z += (player.position.z + 15 - camera.position.z) * 0.1;
-                camera.lookAt(player.position);
                 updateLabels();
-
                 if (ascensionChrist) {
-                    const dA = player.position.distanceTo(new THREE.Vector3(5, 0, -60));
+                    const dA = player.position.distanceTo(new THREE.Vector3(25, 0, -60));
                     if (dA < 20) { if (ascensionChrist.position.y < 6) ascensionChrist.position.y += 0.015; }
                     else { ascensionChrist.position.y = 0; }
                 }
@@ -985,8 +883,7 @@
                     const t = Date.now() * 0.005;
                     if (dP < 25) {
                         flames.forEach((f, i) => {
-                            const ty = 2.4 + Math.sin(t + i) * 0.1;
-                            if (f.position.y > ty + 0.1) f.position.y -= 0.04; else f.position.y = ty;
+                            const ty = 2.4 + Math.sin(t + i) * 0.1; if (f.position.y > ty + 0.1) f.position.y -= 0.04; else f.position.y = ty;
                             const s = 1 + Math.sin(t * 3 + i) * 0.2; f.scale.set(s, s, s);
                         });
                     } else { flames.forEach(f => { f.position.y = 8 + Math.random() * 2; }); }
