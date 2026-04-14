@@ -37,6 +37,8 @@
             text-align: center;
             border-bottom: 2px solid #f59e0b;
             pointer-events: auto;
+            transition: opacity 0.5s ease;
+            opacity: 1;
         }
         .header h1 {
             margin: 0;
@@ -80,6 +82,8 @@
             color: #1e293b;
             font-size: 1rem;
             line-height: 1.5;
+            max-height: 50vh;
+            overflow-y: auto;
         }
         .bible-quote {
             font-style: italic;
@@ -154,16 +158,13 @@
         /* --- CONTRÔLES MOBILE --- */
         #joystick-zone {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
             width: 120px;
             height: 120px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            pointer-events: auto;
-            touch-action: none;
-            display: flex;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            display: none; 
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -171,7 +172,7 @@
         #joystick-knob {
             width: 50px;
             height: 50px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.7);
             border-radius: 50%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             pointer-events: none;
@@ -179,8 +180,8 @@
         }
         #btn-interact {
             position: absolute;
-            bottom: 50px;
-            right: 30px;
+            bottom: 40px;
+            right: 40px;
             width: 90px;
             height: 90px;
             background: #b45309;
@@ -192,43 +193,34 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             pointer-events: auto;
             display: none; 
-            z-index: 1000;
+            z-index: 1001;
             cursor: pointer;
-            touch-action: none;
+            touch-action: manipulation;
             align-items: center;
             justify-content: center;
             text-align: center;
+            transition: background 0.2s, transform 0.1s;
+            user-select: none;
         }
         #btn-interact:active {
             background: #92400e;
             transform: scale(0.95);
         }
-        #pc-hint {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            pointer-events: none;
-            display: none;
-        }
 
-        /* --- QUIZ UI --- */
+        /* --- QUIZ UI CORRIGÉ POUR LE SCROLL --- */
         #quiz-overlay {
             display: none;
-            position: absolute;
+            position: fixed; 
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             background: rgba(15, 23, 42, 0.95);
             z-index: 10000;
-            justify-content: center;
-            align-items: center;
             pointer-events: auto;
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+            padding: 20px 0;
         }
         #quiz-container {
             background: white;
@@ -239,34 +231,18 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             border: 3px solid #b45309;
             text-align: center;
-            overflow-y: auto;
-            max-height: 90vh;
             position: relative;
+            margin: 40px auto; 
         }
         #btn-exit-quiz {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             background: none;
             border: none;
             font-size: 1.5rem;
             color: #b45309;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #btn-exit-quiz:hover {
-            transform: scale(1.2);
-        }
-        #quiz-title {
-            color: #b45309;
-            margin-top: 0;
-            font-size: 1.8rem;
-        }
-        #quiz-question {
-            font-size: 1.2rem;
-            color: #1e293b;
-            margin: 20px 0;
-            font-weight: bold;
         }
         .quiz-option {
             display: block;
@@ -285,47 +261,15 @@
             background: #e2e8f0;
             border-color: #94a3b8;
         }
-        .quiz-option.correct {
-            background: #dcfce7;
-            border-color: #22c55e;
-            color: #166534;
-        }
-        .quiz-option.wrong {
-            background: #fee2e2;
-            border-color: #ef4444;
-            color: #991b1b;
-        }
-        #quiz-feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-            font-size: 0.95rem;
-            text-align: left;
-        }
-        #quiz-next-btn, #quiz-restart-btn {
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: #b45309;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: none;
-        }
-        #quiz-next-btn:hover, #quiz-restart-btn:hover {
-            background: #92400e;
-        }
-        #quiz-progress {
-            font-size: 0.9rem;
-            color: #64748b;
-            margin-bottom: 15px;
-        }
+        .quiz-option.correct { background: #dcfce7; border-color: #22c55e; color: #166534; }
+        .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        #quiz-feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 0.95rem; text-align: left; }
+        #quiz-next-btn, #quiz-restart-btn { margin-top: 20px; padding: 12px 25px; background: #b45309; color: white; border: none; border-radius: 8px; cursor: pointer; display: none; margin-left: auto; margin-right: auto; }
+        #quiz-next-btn:hover, #quiz-restart-btn:hover { background: #92400e; }
+        #quiz-progress { font-size: 0.9rem; color: #64748b; margin-bottom: 15px; }
 
         @media (min-width: 768px) {
             #joystick-zone { display: none !important; }
-            #btn-interact { display: none !important; }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -335,13 +279,11 @@
     <div id="canvas-container"></div>
 
     <div id="ui-layer">
-        <div class="header">
+        <div class="header" id="game-header">
             <h1>Pèlerinage des 50 Jours (Khamaseen)</h1>
             <p>Utilisez les contrôles pour marcher. Approchez les personnages pour méditer les Écritures.</p>
         </div>
 
-        <!-- Contrôles mobiles & PC -->
-        <div id="pc-hint">Appuyez sur ESPACE pour interagir</div>
         <button id="btn-interact">ACTION</button>
         
         <div id="joystick-zone">
@@ -366,7 +308,6 @@
         <div id="fade-overlay"></div>
     </div>
 
-    <!-- Interface du Questionnaire -->
     <div id="quiz-overlay">
         <div id="quiz-container">
             <button id="btn-exit-quiz" title="Quitter le questionnaire">←</button>
@@ -473,7 +414,7 @@
             }
         ];
 
-        // --- DONNÉES DU QUIZ (12 QUESTIONS) ---
+        // --- DONNÉES DU QUIZ ---
         const quizData = [
             {
                 question: "Pendant les 50 jours du Khamaseen, qu'est-il strictement interdit de faire dans l'Église copte orthodoxe ?",
@@ -553,12 +494,12 @@
         window.onload = function() {
             let scene, camera, renderer, player;
             let npcs = [];
-            let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false };
+            let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false, z: false, q: false };
             
             // --- JOYSTICK VARIABLES ---
             let joyX = 0, joyY = 0;
             let isDragging = false;
-            let joyCenterX, joyCenterY, maxJoyRadius = 35;
+            let joyCenterX, joyCenterY, maxJoyRadius = 40;
             const joystickZone = document.getElementById('joystick-zone');
             const joystickKnob = document.getElementById('joystick-knob');
 
@@ -571,12 +512,13 @@
             
             const baseSpeed = 0.12; 
             const rotationSpeed = 0.05; 
-            const interactionDistance = 4;
+            const interactionDistance = 4.5;
             
             let currentQuestionIndex = 0;
             let quizScore = 0;
             let currentLookAt = new THREE.Vector3(0, 12, 0);
             let walkCycle = 0;
+            let headerHideTimer = null;
 
             init();
             animate();
@@ -598,13 +540,10 @@
 
                 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
                 const dirLight = new THREE.DirectionalLight(0xffdfb0, 0.8);
-                dirLight.position.set(20, 40, 20);
+                dirLight.position.set(30, 50, 30);
                 dirLight.castShadow = true;
-                dirLight.shadow.camera.left = -150;
-                dirLight.shadow.camera.right = 150;
-                dirLight.shadow.camera.top = 150;
-                dirLight.shadow.camera.bottom = -150;
-                dirLight.shadow.camera.far = 500;
+                dirLight.shadow.camera.left = -150; dirLight.shadow.camera.right = 150;
+                dirLight.shadow.camera.top = 150; dirLight.shadow.camera.bottom = -150;
                 dirLight.shadow.mapSize.width = 2048;
                 dirLight.shadow.mapSize.height = 2048;
                 scene.add(dirLight);
@@ -637,9 +576,17 @@
                     scene.add(rock); return rock;
                 }
 
-                const rockMat = new THREE.MeshStandardMaterial({ color: 0x78716c });
+                function createBuilding(x, z, w, h, d, mat) {
+                    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); b.position.set(x, h/2, z); b.castShadow = true; b.receiveShadow = true;
+                    scene.add(b); return b;
+                }
 
-                // --- DÉCORS ---
+                const rockMat = new THREE.MeshStandardMaterial({ color: 0x78716c });
+                const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                const houseMat = new THREE.MeshStandardMaterial({ color: 0xebd5b3 });
+                const darkRockMat = new THREE.MeshStandardMaterial({ color: 0x44403c });
+
+                // --- DÉCORS EXTÉRIEURS ---
                 createGroundPatch(-15, -10, 30, 30, 0x4d7c0f, 0.01);
                 createBuilding(-15, -15, 12, 6, 10, rockMat);
                 obstacles.push({ minX: -21.5, maxX: -8.5, minZ: -20.5, maxZ: -9.5 });
@@ -648,7 +595,6 @@
                 stone.rotation.x = Math.PI / 2; stone.position.set(-12, 2, -9); scene.add(stone);
 
                 createGroundPatch(15, -15, 8, 40, 0xa16207, 0.015);
-                const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
                 createBuilding(15, -32, 10, 5, 8, new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
                 obstacles.push({ minX: 9.5, maxX: 20.5, minZ: -36.5, maxZ: -27.5 });
                 const emmRoof = new THREE.Mesh(new THREE.BoxGeometry(11, 0.5, 10), woodMat); emmRoof.position.set(15, 5, -30); scene.add(emmRoof);
@@ -656,7 +602,6 @@
                 const bread = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2), new THREE.MeshStandardMaterial({ color: 0xf59e0b })); bread.position.set(15, 1.7, -27); scene.add(bread);
 
                 createGroundPatch(-5, -55, 35, 50, 0x9ca3af, 0.01);
-                const houseMat = new THREE.MeshStandardMaterial({ color: 0xebd5b3 });
                 createBuilding(-10, -38, 8, 7, 6, houseMat);
                 obstacles.push({ minX: -14.5, maxX: -5.5, minZ: -41.5, maxZ: -34.5 });
                 const roof = new THREE.Mesh(new THREE.BoxGeometry(9, 0.5, 7), new THREE.MeshStandardMaterial({ color: 0x5c4033 })); roof.position.set(-10, 7, -38); scene.add(roof);
@@ -680,21 +625,33 @@
 
                 // --- INTERIEURS ---
                 const sepulchreGroup = new THREE.Group();
-                const darkRockMat = new THREE.MeshStandardMaterial({ color: 0x44403c });
                 const sepFloor = new THREE.Mesh(new THREE.PlaneGeometry(15, 15), darkRockMat); sepFloor.rotation.x = -Math.PI / 2; sepulchreGroup.add(sepFloor);
+                const sepCeiling = new THREE.Mesh(new THREE.BoxGeometry(15, 1, 15), darkRockMat); sepCeiling.position.set(0, 4.5, 0); sepulchreGroup.add(sepCeiling);
+                
                 for(let i=0; i<15; i++) {
-                    const r = createRock(0, 0, 3 + Math.random()*2, 0x292524);
-                    const angle = (i/15) * Math.PI * 2; r.position.set(Math.cos(angle)*7.5, 2.5, Math.sin(angle)*7.5); sepulchreGroup.add(r);
+                    const r = new THREE.Mesh(new THREE.IcosahedronGeometry(2 + Math.random()*2, 0), darkRockMat);
+                    const angle = (i/15) * Math.PI * 2; r.position.set(Math.cos(angle)*7.5, 2.5, Math.sin(angle)*7.5);
+                    r.rotation.set(Math.random(), Math.random(), Math.random());
+                    sepulchreGroup.add(r);
                 }
-                const stoneBed = new THREE.Mesh(new THREE.BoxGeometry(6, 1.2, 3), new THREE.MeshStandardMaterial({color: 0x57534e})); stoneBed.position.set(0, 0.6, -1); sepulchreGroup.add(stoneBed);
-                const linens = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 1.5), new THREE.MeshStandardMaterial({color: 0xffffff})); linens.position.set(-1, 1.25, -1); sepulchreGroup.add(linens);
-                const suaire = new THREE.Mesh(new THREE.BoxGeometry(1, 0.4, 1), new THREE.MeshStandardMaterial({color: 0xf8fafc})); suaire.position.set(2, 1.4, -1); sepulchreGroup.add(suaire);
+                
+                const stoneBed = new THREE.Mesh(new THREE.BoxGeometry(6, 1.2, 3), new THREE.MeshStandardMaterial({color: 0x57534e})); 
+                stoneBed.position.set(0, 0.6, -1); sepulchreGroup.add(stoneBed);
+                
+                const linens = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 1.5), new THREE.MeshStandardMaterial({color: 0xffffff})); 
+                linens.position.set(-1, 1.25, -1); linens.rotation.y = 0.2; sepulchreGroup.add(linens);
+                
+                const suaire = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.2, 0.8), new THREE.MeshStandardMaterial({color: 0xf8fafc})); 
+                suaire.position.set(2, 1.3, -1); suaire.rotation.y = -0.1; sepulchreGroup.add(suaire);
+
                 const sepSpot = new THREE.SpotLight(0xffffff, 1.5, 20); sepSpot.position.set(0, 4, -1); sepSpot.target = stoneBed; sepulchreGroup.add(sepSpot);
+
                 sepulchreGroup.position.set(-500, 0, -500); scene.add(sepulchreGroup);
 
                 const cenacleGroup = new THREE.Group();
                 const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x5c4033 })); floor.rotation.x = -Math.PI / 2; cenacleGroup.add(floor);
                 const cenWallMat = new THREE.MeshStandardMaterial({ color: 0xebd5b3 });
+                const cenCeil = new THREE.Mesh(new THREE.BoxGeometry(30, 1, 30), cenWallMat); cenCeil.position.set(0, 10.5, 0); cenacleGroup.add(cenCeil);
                 const wallN = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), cenWallMat); wallN.position.set(0, 5, -15);
                 const wallS = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), cenWallMat); wallS.position.set(0, 5, 15);
                 const wallE = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), cenWallMat); wallE.position.set(15, 5, 0);
@@ -751,114 +708,141 @@
                     document.getElementById('ui-layer').appendChild(label); npcs.push({ mesh: npcMesh, data: data, label: label });
                 });
 
-                // Écouteurs d'événements
-                window.addEventListener('keydown', (e) => { if (keys.hasOwnProperty(e.key)) keys[e.key] = true; if (e.key === ' ' && !isDialogActive) checkForInteraction(); });
+                // Événements d'interactions
+                window.addEventListener('keydown', (e) => { 
+                    if (keys.hasOwnProperty(e.key)) keys[e.key] = true; 
+                    if (e.key === ' ' || e.code === 'Space') { 
+                        e.preventDefault(); 
+                        const btn = document.getElementById('btn-interact');
+                        if (btn && btn.style.display !== 'none' && !isDialogActive && !isQuizStarted) {
+                            btn.style.transform = 'scale(0.85)';
+                            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
+                            checkForInteraction();
+                        }
+                    }
+                });
                 window.addEventListener('keyup', (e) => { if (keys.hasOwnProperty(e.key)) keys[e.key] = false; });
                 
-                joystickZone.addEventListener('touchstart', handleJoyStart, {passive: false});
-                joystickZone.addEventListener('touchmove', handleJoyMove, {passive: false});
-                joystickZone.addEventListener('touchend', handleJoyEnd);
-                joystickZone.addEventListener('mousedown', handleJoyStart);
+                const handleTouchArea = (e) => {
+                    if (isDialogActive || isQuizStarted) return;
+                    isDragging = true;
+                    let x = e.touches ? e.touches[0].clientX : e.clientX;
+                    let y = e.touches ? e.touches[0].clientY : e.clientY;
+                    joystickZone.style.display = 'flex'; joystickZone.style.left = (x - 60) + 'px'; joystickZone.style.top = (y - 60) + 'px';
+                    const r = joystickZone.getBoundingClientRect(); joyCenterX = r.left + 60; joyCenterY = r.top + 60;
+                };
+
+                document.getElementById('canvas-container').addEventListener('touchstart', handleTouchArea, {passive: false});
+                document.getElementById('canvas-container').addEventListener('mousedown', handleTouchArea);
+                document.addEventListener('touchmove', handleJoyMove, {passive: false});
                 document.addEventListener('mousemove', handleJoyMove);
+                document.addEventListener('touchend', handleJoyEnd);
                 document.addEventListener('mouseup', handleJoyEnd);
 
-                const actionBtn = document.getElementById('btn-interact');
-                actionBtn.addEventListener('click', checkForInteraction);
-                actionBtn.addEventListener('touchstart', (e) => { e.preventDefault(); checkForInteraction(); });
-
+                const interactBtn = document.getElementById('btn-interact');
+                if(interactBtn) interactBtn.addEventListener('click', (e) => { e.stopPropagation(); checkForInteraction(); });
+                
                 document.getElementById('btn-close-dialog').addEventListener('click', closeDialog);
-                document.getElementById('quiz-next-btn').addEventListener('click', () => { currentQuestionIndex++; loadQuizQuestion(); });
-                document.getElementById('quiz-restart-btn').addEventListener('click', () => { location.reload(); });
                 document.getElementById('btn-exit-quiz').addEventListener('click', closeQuiz);
+                document.getElementById('quiz-next-btn').addEventListener('click', () => { currentQuestionIndex++; loadQuizQuestion(); });
+                document.getElementById('quiz-restart-btn').addEventListener('click', () => location.reload());
                 window.addEventListener('resize', onWindowResize);
-            }
-
-            function handleJoyStart(e) {
-                isDragging = true;
-                const rect = joystickZone.getBoundingClientRect();
-                joyCenterX = rect.left + rect.width / 2;
-                joyCenterY = rect.top + rect.height / 2;
-                handleJoyMove(e);
             }
 
             function handleJoyMove(e) {
                 if (!isDragging) return;
-                e.preventDefault();
-                let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                let dx = clientX - joyCenterX;
-                let dy = clientY - joyCenterY;
-                let distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance > maxJoyRadius) { dx = (dx / distance) * maxJoyRadius; dy = (dy / distance) * maxJoyRadius; }
+                let x = e.touches ? e.touches[0].clientX : e.clientX;
+                let y = e.touches ? e.touches[0].clientY : e.clientY;
+                let dx = x - joyCenterX, dy = y - joyCenterY;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist > maxJoyRadius) { dx = (dx/dist)*maxJoyRadius; dy = (dy/dist)*maxJoyRadius; }
                 joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-                joyX = dx / maxJoyRadius; joyY = dy / maxJoyRadius;
+                joyX = dx/maxJoyRadius; joyY = dy/maxJoyRadius;
             }
 
-            function handleJoyEnd() { isDragging = false; joystickKnob.style.transform = `translate(0px, 0px)`; joyX = 0; joyY = 0; }
+            function handleJoyEnd() { isDragging = false; joystickZone.style.display = 'none'; joyX = 0; joyY = 0; }
 
+            // Création de personnages Low-Poly réalistes avec corps, tête, et bras
             function createHuman(c, glow = false) {
                 const g = new THREE.Group(); 
                 const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
                 const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
                 const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
-                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m); body.position.y = 0.55; body.castShadow = !glow;
-                const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m); shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
-                const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat); neck.position.y = 1.25; neck.castShadow = !glow;
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat); head.position.y = 1.45; head.castShadow = !glow;
-                const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m); armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
-                const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m); armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
+
+                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
+                body.position.y = 0.55; body.castShadow = !glow;
+
+                const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
+                shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
+
+                const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
+                neck.position.y = 1.25; neck.castShadow = !glow;
+
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
+                head.position.y = 1.45; head.castShadow = !glow;
+
+                const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+                armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
+
+                const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+                armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
+
                 const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
                 const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
+
                 g.add(body, shoulders, neck, head, armL, armR, handL, handR);
-                if (!glow) { const hair = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.7), hairMat); hair.position.y = 1.46; hair.castShadow = true; g.add(hair); }
+                if (!glow) {
+                    const hair = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.7), hairMat);
+                    hair.position.y = 1.46; hair.castShadow = true; g.add(hair);
+                }
                 g.position.y = 0; return g;
             }
 
-            function createBuilding(x, z, w, h, d, mat) {
-                const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); b.position.set(x, h/2, z); b.castShadow = true; b.receiveShadow = true;
-                scene.add(b); return b;
-            }
-
-            function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+            function onWindowResize() { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
 
             function checkForInteraction() {
-                let closest = null; let minD = interactionDistance;
-                npcs.forEach(npc => {
-                    if (npc.data.id === "finish_line") return;
-                    if (Math.abs(player.position.x - npc.data.position.x) < 50 && Math.abs(player.position.z - npc.data.position.z) < 50) {
-                        const pos = (npc.data.id === 'ascension' || npc.data.id === 'commission') ? new THREE.Vector3(npc.data.position.x, 0, npc.data.position.z) : npc.mesh.position;
-                        const d = player.position.distanceTo(pos); if (d < minD) { minD = d; closest = npc; }
-                    }
+                if (isDialogActive) return;
+                let closest = null, minD = interactionDistance;
+                npcs.forEach(n => {
+                    if (n.data.id === "finish_line") return;
+                    let p = (n.data.id === 'ascension' || n.data.id === 'commission') ? new THREE.Vector3(n.data.position.x, 0, n.data.position.z) : n.mesh.position;
+                    let d = player.position.distanceTo(p); if (d < minD) { minD = d; closest = n; }
                 });
                 if (closest) openDialog(closest.data);
             }
 
             function openDialog(d) {
-                if (d.action === "teleport_inside") { teleportPlayer(500, 498); return; }
-                if (d.action === "teleport_outside") { teleportPlayer(-10, -32); return; }
-                if (d.action === "teleport_sepulchre_inside") { teleportPlayer(-500, -493); return; }
-                if (d.action === "teleport_sepulchre_outside") { teleportPlayer(-15, -5); return; }
+                if (d.action.includes("teleport")) { teleport(d.action); return; }
                 if (d.action === "start_quiz") { startQuiz(); return; }
-                isDialogActive = true; for (let k in keys) keys[k] = false;
-                document.getElementById('dialog-title').innerText = d.title; document.getElementById('dialog-quote').innerText = d.quote;
-                document.getElementById('dialog-dogma').innerText = d.dogma; document.getElementById('dialog-sources').innerText = "Sources : " + d.sources;
-                document.getElementById('dialog-box').classList.add('active'); 
-                document.getElementById('btn-interact').style.display = 'none';
-                document.getElementById('pc-hint').style.display = 'none';
+                isDialogActive = true; 
+                for (let k in keys) keys[k] = false; joyX = 0; joyY = 0;
+                document.getElementById('dialog-title').innerText = d.title;
+                document.getElementById('dialog-quote').innerText = d.quote;
+                document.getElementById('dialog-dogma').innerText = d.dogma;
+                document.getElementById('dialog-sources').innerText = "Sources : " + (d.sources || "Tradition");
+                document.getElementById('dialog-box').classList.add('active');
             }
 
             function closeDialog() { isDialogActive = false; document.getElementById('dialog-box').classList.remove('active'); }
 
-            function teleportPlayer(tx, tz) {
-                const o = document.getElementById('fade-overlay'); o.style.opacity = '1'; isDialogActive = true;
+            function teleport(act) {
+                const o = document.getElementById('fade-overlay'); 
+                if (o) o.style.opacity = '1'; 
+                isDialogActive = true;
                 setTimeout(() => {
-                    player.position.set(tx, 0, tz);
-                    if (tx < -400 || tx > 400) { 
-                        player.rotation.y = Math.PI; camera.position.set(tx, 1.5, tz); currentLookAt.set(tx, 1.5, tz - 5); camera.lookAt(currentLookAt); 
+                    if(act === "teleport_sepulchre_inside") player.position.set(-500, 0, -494);
+                    else if(act === "teleport_sepulchre_outside") player.position.set(-15, 0, -5);
+                    else if(act === "teleport_inside") player.position.set(500, 0, 498);
+                    else if(act === "teleport_outside") player.position.set(-10, 0, -32);
+                    
+                    if (Math.abs(player.position.x) > 400) { 
+                        player.rotation.y = Math.PI; camera.position.set(player.position.x, 1.5, player.position.z); 
+                        currentLookAt.set(player.position.x, 1.5, player.position.z - 5); camera.lookAt(currentLookAt); 
                     } else { 
-                        camera.position.set(tx, 12, tz + 15); camera.lookAt(player.position); 
+                        camera.position.set(player.position.x, 12, player.position.z + 15); 
                     }
-                    setTimeout(() => { o.style.opacity = '0'; isDialogActive = false; }, 500);
+                    if (o) o.style.opacity = '0'; 
+                    isDialogActive = false; 
                 }, 1000);
             }
 
@@ -866,153 +850,160 @@
                 if (isQuizStarted) return;
                 isQuizStarted = true; isDialogActive = true; for (let k in keys) keys[k] = false; joyX = 0; joyY = 0;
                 document.getElementById('ui-layer').style.display = 'none';
-                document.getElementById('quiz-overlay').style.display = 'flex';
+                document.getElementById('quiz-overlay').style.display = 'block';
                 currentQuestionIndex = 0; quizScore = 0; loadQuizQuestion();
             }
 
-            function closeQuiz() { isQuizStarted = false; isDialogActive = false; document.getElementById('quiz-overlay').style.display = 'none'; document.getElementById('ui-layer').style.display = 'flex'; player.position.z += 5; }
+            function closeQuiz() {
+                isQuizStarted = false; isDialogActive = false;
+                document.getElementById('quiz-overlay').style.display = 'none';
+                document.getElementById('ui-layer').style.display = 'flex';
+                player.position.z += 5;
+            }
 
             function loadQuizQuestion() {
-                const qData = quizData[currentQuestionIndex]; const feedback = document.getElementById('quiz-feedback'); const next = document.getElementById('quiz-next-btn'); const options = document.getElementById('quiz-options');
-                feedback.style.display = 'none'; next.style.display = 'none'; options.innerHTML = '';
-                if (currentQuestionIndex >= quizData.length) { showFinalScore(); return; }
-                document.getElementById('quiz-progress').innerText = `Question ${currentQuestionIndex + 1} / ${quizData.length}`; document.getElementById('quiz-question').innerText = qData.question;
-                qData.options.forEach((opt, i) => { const btn = document.createElement('button'); btn.className = 'quiz-option'; btn.innerText = opt; btn.onclick = () => handleAnswer(i, qData.correctAnswer, qData.explanation); options.appendChild(btn); });
+                const q = quizData[currentQuestionIndex]; const opt = document.getElementById('quiz-options'); document.getElementById('quiz-feedback').style.display = 'none'; document.getElementById('quiz-next-btn').style.display = 'none'; opt.innerHTML = '';
+                if (currentQuestionIndex >= quizData.length) { showScore(); return; }
+                document.getElementById('quiz-progress').innerText = `Question ${currentQuestionIndex + 1} / ${quizData.length}`; document.getElementById('quiz-question').innerText = q.question;
+                q.options.forEach((o, i) => { const b = document.createElement('button'); b.className = 'quiz-option'; b.innerText = o; b.onclick = () => handleAnswer(i, q.correctAnswer, q.explanation); opt.appendChild(b); });
+                
+                const quizOverlay = document.getElementById('quiz-overlay');
+                if(quizOverlay) quizOverlay.scrollTop = 0;
             }
 
-            function handleAnswer(sel, corr, expl) {
-                const btns = document.querySelectorAll('.quiz-option'); const feedback = document.getElementById('quiz-feedback'); const next = document.getElementById('quiz-next-btn');
-                btns.forEach(b => b.disabled = true);
-                if (sel === corr) { btns[sel].classList.add('correct'); quizScore++; feedback.innerHTML = `<strong>Excellente réponse !</strong><br>${expl}`; feedback.style.background = "#dcfce7"; feedback.style.color = "#166534"; }
-                else { btns[sel].classList.add('wrong'); btns[corr].classList.add('correct'); feedback.innerHTML = `<strong>Erreur !</strong><br>${expl}`; feedback.style.background = "#fee2e2"; feedback.style.color = "#991b1b"; }
-                feedback.style.display = 'block'; next.style.display = 'inline-block';
+            function handleAnswer(s, c, e) {
+                const btns = document.querySelectorAll('.quiz-option'); const f = document.getElementById('quiz-feedback'); btns.forEach(b => b.disabled = true);
+                if (s === c) { btns[s].classList.add('correct'); quizScore++; f.innerHTML = "<strong>Vrai !</strong> " + e; f.style.background = "#dcfce7"; }
+                else { btns[s].classList.add('wrong'); btns[c].classList.add('correct'); f.innerHTML = "<strong>Erreur.</strong> " + e; f.style.background = "#fee2e2"; }
+                f.style.display = 'block'; document.getElementById('quiz-next-btn').style.display = 'block';
+                
+                setTimeout(() => {
+                    const quizOverlay = document.getElementById('quiz-overlay');
+                    if(quizOverlay) quizOverlay.scrollTop += 150;
+                }, 100);
             }
 
-            function showFinalScore() {
-                const qDiv = document.getElementById('quiz-question');
-                qDiv.innerHTML = `<span style="font-size:3rem; display:block; color:#b45309;">${quizScore} / ${quizData.length}</span><br>${quizScore >= 9 ? "Parfait ! Vous êtes un excellent témoin." : "Très bien ! Relisez les sources pour parfaire vos connaissances."}`;
+            function showScore() {
+                document.getElementById('quiz-question').innerHTML = `<span style="font-size:3rem; color:#b45309;">${quizScore} / ${quizData.length}</span><br>Bravo pour ce pèlerinage !`;
                 document.getElementById('quiz-restart-btn').style.display = 'inline-block';
             }
 
-            function updateLabels() {
-                let near = false;
-                let closestActionText = "ACTION";
-                let minD = interactionDistance;
+            function updateUI(moved) {
+                const h = document.getElementById('game-header');
+                const btn = document.getElementById('btn-interact');
 
-                npcs.forEach(npc => {
-                    let d = 999;
-                    if (Math.abs(player.position.x - npc.data.position.x) < 50 && Math.abs(player.position.z - npc.data.position.z) < 50) {
-                        const pos = (npc.data.id === 'ascension' || npc.data.id === 'finish_line' || npc.data.id === 'commission') ? new THREE.Vector3(npc.data.position.x, 0, npc.data.position.z) : npc.mesh.position;
-                        d = player.position.distanceTo(pos);
+                if (h) {
+                    if (moved) {
+                        h.style.opacity = '0';
+                        if(headerHideTimer) { clearTimeout(headerHideTimer); headerHideTimer = null; }
+                    } else if (!headerHideTimer && h.style.opacity === '0') {
+                        headerHideTimer = setTimeout(() => {
+                            h.style.opacity = '1';
+                            headerHideTimer = null;
+                        }, 3000);
                     }
+                }
+
+                let near = false, txt = "ACTION", minD = interactionDistance;
+                npcs.forEach(n => {
+                    let p = (n.data.id === 'ascension' || n.data.id === 'commission') ? new THREE.Vector3(n.data.position.x, 0, n.data.position.z) : n.mesh.position;
+                    let d = player.position.distanceTo(p);
+                    if (d < minD) { near = true; minD = d; if(n.data.action === "dialog") txt = "MÉDITER"; else if(n.data.action.includes("inside")) txt = "ENTRER"; else if(n.data.action.includes("outside")) txt = "SORTIR"; else txt = "ÉPREUVE"; }
+                    const v = n.mesh.position.clone(); v.y += 2.5; v.project(camera);
+                    const x = (v.x*.5+.5)*window.innerWidth, y = (v.y*-.5+.5)*window.innerHeight;
                     
-                    if (d < minD) {
-                        near = true;
-                        minD = d;
-                        // Déterminer le libellé en fonction de l'action
-                        if (npc.data.action === "dialog") closestActionText = "MÉDITER";
-                        else if (npc.data.action.includes("inside")) closestActionText = "ENTRER";
-                        else if (npc.data.action.includes("outside")) closestActionText = "SORTIR";
-                        else if (npc.data.action === "start_quiz") closestActionText = "ÉPREUVE";
+                    if (n.label && n.label.style) {
+                        if (v.z > 1) { 
+                            n.label.style.opacity = '0'; 
+                        } else { 
+                            n.label.style.opacity = '1'; 
+                            n.label.style.left = x + 'px'; 
+                            n.label.style.top = y + 'px'; 
+                        }
                     }
-
-                    const v = npc.mesh.position.clone(); v.y += (npc.data.id === 'pentecost') ? 3.8 : 2.2; 
-                    if (npc.data.id === 'finish_line') v.y += 2.0; if (npc.data.id === 'commission') v.y += 4.0;
-                    v.project(camera); const x = (v.x * .5 + .5) * window.innerWidth; const y = (v.y * -.5 + .5) * window.innerHeight;
-                    if (v.z > 1) { npc.label.style.opacity = '0'; } else { npc.label.style.opacity = '1'; npc.label.style.left = `${x}px`; npc.label.style.top = `${y}px`; }
                 });
                 
-                const isMobile = window.innerWidth < 768;
-                const interactBtn = document.getElementById('btn-interact');
-                const pcHint = document.getElementById('pc-hint');
-
-                if (near && !isDialogActive && !isQuizStarted) {
-                    if(isMobile) {
-                        interactBtn.innerText = closestActionText;
-                        interactBtn.style.display = 'flex';
-                        pcHint.style.display = 'none';
+                if (btn) {
+                    if (near && !isDialogActive && !isQuizStarted) { 
+                        const isMobile = window.innerWidth < 768;
+                        btn.innerHTML = isMobile ? txt : txt + '<br><small style="font-size:10px">(Espace)</small>'; 
+                        btn.style.display = 'flex'; 
+                        btn.style.flexDirection = 'column';
                     } else {
-                        interactBtn.style.display = 'none';
-                        pcHint.innerText = `Appuyez sur ESPACE pour ${closestActionText.toLowerCase()}`;
-                        pcHint.style.display = 'block';
+                        btn.style.display = 'none';
                     }
-                } else {
-                    interactBtn.style.display = 'none';
-                    pcHint.style.display = 'none';
                 }
             }
 
-            function checkCollision(x, z) {
-                if (Math.abs(x) > 400) return false;
-                const margin = 0.5;
-                for (let obs of obstacles) { if (x + margin > obs.minX && x - margin < obs.maxX && z + margin > obs.minZ && z - margin < obs.maxZ) return true; }
-                return false;
+            function checkColl(x, z) { 
+                if (Math.abs(x) > 400) return false; 
+                for (let o of obstacles) { 
+                    if (x > o.minX && x < o.maxX && z > o.minZ && z < o.maxZ) return true; 
+                } 
+                return false; 
             }
 
             function animate() {
                 requestAnimationFrame(animate);
-                const inSepulchre = player.position.x < -400;
-                const inCenacle = player.position.x > 400;
-                const isFirstPerson = inSepulchre || inCenacle;
-                const currentSpeed = isFirstPerson ? baseSpeed * 0.3 : baseSpeed;
-                let isMoving = false;
+                const isInside = Math.abs(player.position.x) > 400;
+                const speed = isInside ? baseSpeed * 0.4 : baseSpeed;
+                let moved = false;
 
                 if (!isDialogActive && !isQuizStarted) {
-                    if (isFirstPerson) {
-                        if (keys.ArrowLeft || keys.a) player.rotation.y += rotationSpeed;
-                        if (keys.ArrowRight || keys.d) player.rotation.y -= rotationSpeed;
-                        if (Math.abs(joyX) > 0.1) player.rotation.y -= joyX * rotationSpeed;
-                        let moveDir = 0; if (keys.ArrowUp || keys.w) moveDir = 1; if (keys.ArrowDown || keys.s) moveDir = -1;
-                        if (Math.abs(joyY) > 0.1) moveDir = -joyY;
-                        if (moveDir !== 0) {
-                            let nextX = player.position.x + Math.sin(player.rotation.y) * currentSpeed * moveDir;
-                            let nextZ = player.position.z + Math.cos(player.rotation.y) * currentSpeed * moveDir;
-                            if (inSepulchre) { if (nextX > -507 && nextX < -493 && nextZ > -507 && nextZ < -492) { player.position.x = nextX; player.position.z = nextZ; isMoving = true; } }
-                            else if (inCenacle) { if (nextX > 486 && nextX < 514 && nextZ > 486 && nextZ < 514) { player.position.x = nextX; player.position.z = nextZ; isMoving = true; } }
+                    let rotInput = -joyX;
+                    if (keys.ArrowLeft || keys.a || keys.q) rotInput += 1;
+                    if (keys.ArrowRight || keys.d) rotInput -= 1;
+
+                    let moveForwardInput = -joyY;
+                    if (keys.ArrowUp || keys.w || keys.z) moveForwardInput += 1;
+                    if (keys.ArrowDown || keys.s) moveForwardInput -= 1;
+
+                    if (isInside) {
+                        player.rotation.y += rotInput * rotationSpeed;
+                        if (Math.abs(moveForwardInput) > 0.1) {
+                            let nx = player.position.x + Math.sin(player.rotation.y) * speed * moveForwardInput;
+                            let nz = player.position.z + Math.cos(player.rotation.y) * speed * moveForwardInput;
+                            if(Math.abs(nx) > 486 && Math.abs(nx) < 514 && Math.abs(nz) > 486 && Math.abs(nz) < 514) { player.position.set(nx, 0, nz); moved = true; }
                         }
                     } else {
-                        let moveX = 0, moveZ = 0;
-                        if (keys.ArrowUp || keys.w) moveZ -= 1; if (keys.ArrowDown || keys.s) moveZ += 1;
-                        if (keys.ArrowLeft || keys.a) moveX -= 1; if (keys.ArrowRight || keys.d) moveX += 1;
-                        if (Math.abs(joyX) > 0.1) moveX = joyX; if (Math.abs(joyY) > 0.1) moveZ = joyY;
-                        if (moveX !== 0 || moveZ !== 0) {
-                            isMoving = true; const len = Math.sqrt(moveX*moveX + moveZ*moveZ);
-                            let nextX = player.position.x + (moveX/len) * currentSpeed; let nextZ = player.position.z + (moveZ/len) * currentSpeed;
-                            if (!checkCollision(nextX, nextZ)) { player.position.x = nextX; player.position.z = nextZ; player.rotation.y = Math.atan2(moveX, moveZ); }
+                        let mx = joyX;
+                        if (keys.ArrowLeft || keys.a || keys.q) mx -= 1;
+                        if (keys.ArrowRight || keys.d) mx += 1;
+                        let mz = joyY;
+                        if (keys.ArrowUp || keys.w || keys.z) mz -= 1;
+                        if (keys.ArrowDown || keys.s) mz += 1;
+
+                        if (mx !== 0 || mz !== 0) {
+                            const len = Math.sqrt(mx*mx+mz*mz);
+                            let nx = player.position.x + (mx/len)*speed; let nz = player.position.z + (mz/len)*speed;
+                            if(!checkColl(nx, nz)) { player.position.set(nx, 0, nz); player.rotation.y = Math.atan2(mx, mz); moved = true; }
                         }
                     }
                     if (player.position.distanceTo(new THREE.Vector3(0, 0, -100)) < 2.5) startQuiz();
                 }
 
-                if (isMoving) { walkCycle += 0.15; player.position.y = Math.abs(Math.sin(walkCycle)) * 0.15;
+                if(moved) { walkCycle += 0.2; player.position.y = Math.abs(Math.sin(walkCycle))*0.12; 
                     const inWater = player.position.x > -60 && player.position.x < -30 && player.position.z > -75 && player.position.z < -45;
-                    if (inWater && Math.random() < 0.15 && !isFirstPerson) {
+                    if (inWater && Math.random() < 0.15 && !isInside) {
                         const ripple = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.4, 16), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, side: THREE.DoubleSide }));
                         ripple.rotation.x = -Math.PI / 2; ripple.position.set(player.position.x, 0.015, player.position.z); scene.add(ripple); ripples.push(ripple);
                     }
-                } else { player.position.y = 0; }
-                
+                } else player.position.y = 0;
+
                 for (let i = ripples.length - 1; i >= 0; i--) { let r = ripples[i]; r.scale.addScalar(0.04); r.material.opacity -= 0.02; if (r.material.opacity <= 0) { scene.remove(r); r.geometry.dispose(); r.material.dispose(); ripples.splice(i, 1); } }
 
-                if (isFirstPerson) {
-                    player.visible = false; camera.position.copy(player.position); camera.position.y += 1.5; 
-                    const targetLookAt = new THREE.Vector3(player.position.x + Math.sin(player.rotation.y) * 5, camera.position.y, player.position.z + Math.cos(player.rotation.y) * 5);
-                    currentLookAt.lerp(targetLookAt, 0.1); camera.lookAt(currentLookAt);
+                if (isInside) {
+                    player.visible = false; camera.position.set(player.position.x, 1.5, player.position.z);
+                    const tL = new THREE.Vector3(player.position.x + Math.sin(player.rotation.y)*5, 1.5, player.position.z + Math.cos(player.rotation.y)*5);
+                    currentLookAt.lerp(tL, 0.1); camera.lookAt(currentLookAt);
                 } else {
                     player.visible = true; player.position.x = Math.max(-95, Math.min(95, player.position.x)); player.position.z = Math.max(-110, Math.min(145, player.position.z));
-                    camera.position.x += (player.position.x - camera.position.x) * 0.1; camera.position.y += (12 - camera.position.y) * 0.1;
-                    camera.position.z += (player.position.z + 15 - camera.position.z) * 0.1; camera.lookAt(player.position);
+                    camera.position.x += (player.position.x - camera.position.x)*0.1; camera.position.y += (12 - camera.position.y)*0.1; camera.position.z += (player.position.z + 15 - camera.position.z)*0.1; camera.lookAt(player.position);
                 }
-                updateLabels();
-                if (ascensionChrist) {
-                    const dA = player.position.distanceTo(new THREE.Vector3(25, 0, -60));
-                    if (dA < 20) { if (ascensionChrist.position.y < 6) ascensionChrist.position.y += 0.015; } else { ascensionChrist.position.y = 0; }
-                }
-                if (flames.length > 0) {
-                    const dP = player.position.distanceTo(new THREE.Vector3(0, 0, -80)); const t = Date.now() * 0.005;
-                    if (dP < 25) { flames.forEach((f, i) => { const ty = 2.4 + Math.sin(t + i) * 0.1; if (f.position.y > ty + 0.1) f.position.y -= 0.04; else f.position.y = ty; const s = 1 + Math.sin(t * 3 + i) * 0.2; f.scale.set(s, s, s); }); }
-                    else { flames.forEach(f => { f.position.y = 8 + Math.random() * 2; }); }
-                }
+                
+                updateUI(moved);
+                if (ascensionChrist && player.position.distanceTo(new THREE.Vector3(25, 0, -60)) < 20) { if(ascensionChrist.position.y < 6) ascensionChrist.position.y += 0.015; } else if(ascensionChrist) ascensionChrist.position.y = 0;
+                
                 renderer.render(scene, camera);
             }
         };
