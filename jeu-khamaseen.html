@@ -676,12 +676,28 @@
                         cloud.position.set(data.position.x, 6, data.position.z); scene.add(cloud);
                     } else if (data.id === "pentecost") {
                         npcMesh = createHuman(data.color); npcMesh.position.set(data.position.x, 0, data.position.z);
-                        const fGeo = new THREE.ConeGeometry(0.2, 0.6, 8); const fMat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
-                        const mF = new THREE.Mesh(fGeo, fMat); mF.position.set(data.position.x, 8, data.position.z); scene.add(mF); flames.push(mF);
-                        [{x: -2, z: 0}, {x: 2, z: 0}].forEach(off => {
-                            const disc = createHuman(0x64748b); disc.position.set(data.position.x + off.x, 0, data.position.z + off.z); scene.add(disc);
-                            const f = new THREE.Mesh(fGeo, fMat); f.position.set(data.position.x + off.x, 8 + Math.random(), data.position.z + off.z); scene.add(f); flames.push(f);
-                        });
+                        
+                        const flameGeo = new THREE.ConeGeometry(0.15, 0.5, 8); 
+                        const flameMat = new THREE.MeshBasicMaterial({ color: 0xff4500 });
+                        const mainFlame = new THREE.Mesh(flameGeo, flameMat); 
+                        mainFlame.position.set(data.position.x, 8, data.position.z); 
+                        scene.add(mainFlame); flames.push(mainFlame);
+                        
+                        // 11 autres disciples en cercle pour la Pentecôte (total 12 avec celui du centre)
+                        for(let i=0; i<11; i++) {
+                            const angle = (i/11) * Math.PI * 2;
+                            const px = data.position.x + Math.cos(angle) * 3;
+                            const pz = data.position.z + Math.sin(angle) * 3;
+                            
+                            const disc = createHuman(0x64748b); 
+                            disc.position.set(px, 0, pz); 
+                            disc.lookAt(new THREE.Vector3(data.position.x, 0, data.position.z));
+                            scene.add(disc);
+                            
+                            const f = new THREE.Mesh(flameGeo, flameMat); 
+                            f.position.set(px, 8 + Math.random(), pz); 
+                            scene.add(f); flames.push(f);
+                        }
                     } else if (data.id === "emmaus") {
                         npcMesh = createHuman(data.color); npcMesh.position.set(data.position.x - 1.5, 0, data.position.z);
                         const disc2 = createHuman(0xb45309); disc2.position.set(data.position.x + 1.5, 0, data.position.z); scene.add(disc2);
@@ -925,10 +941,8 @@
                 
                 if (btn) {
                     if (near && !isDialogActive && !isQuizStarted) { 
-                        const isMobile = window.innerWidth < 768;
-                        btn.innerHTML = isMobile ? txt : txt + '<br><small style="font-size:10px">(Espace)</small>'; 
+                        btn.innerText = txt; 
                         btn.style.display = 'flex'; 
-                        btn.style.flexDirection = 'column';
                     } else {
                         btn.style.display = 'none';
                     }
@@ -1004,6 +1018,23 @@
                 updateUI(moved);
                 if (ascensionChrist && player.position.distanceTo(new THREE.Vector3(25, 0, -60)) < 20) { if(ascensionChrist.position.y < 6) ascensionChrist.position.y += 0.015; } else if(ascensionChrist) ascensionChrist.position.y = 0;
                 
+                if (flames.length > 0) {
+                    const dP = player.position.distanceTo(new THREE.Vector3(0, 0, -80)); 
+                    const t = Date.now() * 0.005;
+                    if (dP < 18) { 
+                        flames.forEach((f, i) => { 
+                            const ty = 2.2 + Math.sin(t + i) * 0.1; 
+                            if (f.position.y > ty + 0.1) f.position.y -= 0.025; 
+                            else f.position.y = ty; 
+                            const s = 1 + Math.sin(t * 3 + i) * 0.2; f.scale.set(s, s, s); 
+                        }); 
+                    } else { 
+                        flames.forEach(f => { 
+                            if (f.position.y < 8) f.position.y += 0.1; 
+                        }); 
+                    }
+                }
+
                 renderer.render(scene, camera);
             }
         };
