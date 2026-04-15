@@ -404,7 +404,7 @@
                 sources: "Bible : Jean 20:6-7. Exégèse copte.", action: "dialog"
             },
             {
-                id: "sepulchre_exit", name: "Sortir du Tombeau", position: { x: -500, z: -492 }, color: 0x475569,
+                id: "sepulchre_exit", name: "Sortir du Tombeau", position: { x: -501.5, z: -494.9 }, color: 0x475569,
                 title: "Sortir", quote: "", dogma: "", sources: "", action: "teleport_sepulchre_outside"
             },
             {
@@ -452,7 +452,7 @@
                 sources: "Bible : Jean 21:1-19.", action: "dialog"
             },
             {
-                id: "commission", name: "La mission des disciples", position: { x: 45, z: -78 }, color: 0xffffff,
+                id: "commission", name: "La mission des disciples", position: { x: 45.7, z: -83.6 }, color: 0xffffff,
                 title: "La Montagne en Galilée", quote: "« Les onze disciples allèrent en Galilée, sur la montagne que Jésus leur avait désignée. [...] Allez, faites de toutes les nations des disciples, les baptisant au nom du Père, du Fils et du Saint-Esprit. » (Matthieu 28:16,19)",
                 dogma: "Fondement dogmatique du sacrement du Baptême Trinitaire.",
                 sources: "Bible : Matthieu 28:16-20.", action: "dialog"
@@ -669,7 +669,7 @@
                 const emmRoof = new THREE.Mesh(new THREE.BoxGeometry(11, 0.5, 10), woodMat); emmRoof.position.set(15, 5, -30); scene.add(emmRoof);
                 const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 3), woodMat); tableTop.position.set(15, 1.5, -27); scene.add(tableTop);
                 const bread = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2), new THREE.MeshStandardMaterial({ color: 0xf59e0b })); bread.position.set(15, 1.7, -27); scene.add(bread);
-
+                
                 createGroundPatch(-5, -55, 35, 50, 0x9ca3af, 0.01);
                 createBuilding(-10, -38, 8, 7, 6, houseMat);
                 obstacles.push({ minX: -14.5, maxX: -5.5, minZ: -41.5, maxZ: -34.5 });
@@ -789,7 +789,7 @@
                             const d = createHuman(0x64748b); d.position.set(data.position.x - 3, 0, data.position.z + i*1.5); scene.add(d);
                         }
                     } else if (data.id === "commission") {
-                        npcMesh = createHuman(0xffffff, true); npcMesh.position.set(data.position.x, 4, data.position.z);
+                        npcMesh = createHuman(0xffffff, true); npcMesh.position.set(data.position.x-0.5, 5, data.position.z+4);
                         for(let i=0; i<11; i++) { 
                             const d = createHuman(0x64748b);
                             const angle = (i/11) * Math.PI * 1.5 + Math.PI*0.25; 
@@ -859,41 +859,113 @@
 
             function handleJoyEnd() { isDragging = false; joystickZone.style.display = 'none'; joyX = 0; joyY = 0; }
 
-            // Personnages Low-Poly réalistes
-            function createHuman(c, glow = false) {
-                const g = new THREE.Group(); 
-                const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
-                const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
-                const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
+            // // Personnages Low-Poly réalistes
+            // function createHuman(c, glow = false) {
+            //     const g = new THREE.Group(); 
+            //     const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
+            //     const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
+            //     const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
 
-                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
-                body.position.y = 0.55; body.castShadow = !glow;
+            //     const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
+            //     body.position.y = 0.55; body.castShadow = !glow;
 
-                const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
-                shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
+            //     const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
+            //     shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
 
-                const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
-                neck.position.y = 1.25; neck.castShadow = !glow;
+            //     const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
+            //     neck.position.y = 1.25; neck.castShadow = !glow;
 
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
-                head.position.y = 1.45; head.castShadow = !glow;
+            //     const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
+            //     head.position.y = 1.45; head.castShadow = !glow;
 
-                const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
-                armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
+            //     const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+            //     armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
 
-                const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
-                armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
+            //     const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+            //     armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
 
-                const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
-                const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
+            //     const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
+            //     const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
 
-                g.add(body, shoulders, neck, head, armL, armR, handL, handR);
-                if (!glow) {
-                    const hair = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.7), hairMat);
-                    hair.position.y = 1.46; hair.castShadow = true; g.add(hair);
-                }
-                g.position.y = 0; return g;
-            }
+            //     g.add(body, shoulders, neck, head, armL, armR, handL, handR);
+            //     if (!glow) {
+            //         const hair = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.7), hairMat);
+            //         hair.position.y = 1.46; hair.castShadow = true; g.add(hair);
+            //     }
+            //     g.position.y = 0; return g;
+            // }
+            
+            // Personnages Low-Poly réalistes (Visage visible)
+function createHuman(c, glow = false) {
+    const g = new THREE.Group(); 
+    const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
+    const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
+    const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
+    
+    // Matériaux pour les détails du visage
+    const eyeMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3 });
+    const lipMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x8b5a5a, roughness: 0.6 });
+
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
+    body.position.y = 0.55; body.castShadow = !glow;
+
+    const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
+    shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
+
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
+    neck.position.y = 1.25; neck.castShadow = !glow;
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
+    head.position.y = 1.45; head.castShadow = !glow;
+
+    // --- AJOUT DES TRAITS DU VISAGE ---
+    const eyeGeom = new THREE.SphereGeometry(0.025, 8, 8);
+    const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
+    eyeL.position.set(-0.08, 1.48, 0.19);
+    
+    const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
+    eyeR.position.set(0.08, 1.48, 0.19);
+
+    const noseGeom = new THREE.ConeGeometry(0.025, 0.08, 4);
+    const nose = new THREE.Mesh(noseGeom, skinMat);
+    nose.position.set(0, 1.41, 0.22);
+    nose.rotation.x = Math.PI / 2;
+
+    const mouthGeom = new THREE.BoxGeometry(0.08, 0.015, 0.03);
+    const mouth = new THREE.Mesh(mouthGeom, lipMat);
+    mouth.position.set(0, 1.34, 0.19);
+    // ---------------------------------
+
+    const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+    armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
+
+    const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+    armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
+
+    const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
+    const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
+
+    g.add(body, shoulders, neck, head, eyeL, eyeR, nose, mouth, armL, armR, handL, handR);
+
+    // Ajout des cheveux uniquement si le personnage n'est pas "glow"
+    if (!glow) {
+        // MODIFICATION : phiLength réduit de Math.PI * 2 à Math.PI * 1.4 (environ 250 degrés)
+        const hairGeom = new THREE.SphereGeometry(0.24, 16, 16, 5.7, Math.PI * 1.4, 0, Math.PI / 1.7);
+        const hair = new THREE.Mesh(hairGeom, hairMat);
+        hair.position.y = 1.46; 
+        
+        // MODIFICATION : Rotation de PI (180 degrés) autour de Y pour orienter l'ouverture vers l'avant.
+        hair.rotation.y = Math.PI; 
+        
+        
+        hair.castShadow = true; 
+        g.add(hair);
+    }
+    
+    
+    g.position.y = 0; 
+    return g;
+}
 
             function onWindowResize() { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
 
@@ -927,7 +999,7 @@
                 if (o) o.style.opacity = '1'; 
                 isDialogActive = true;
                 setTimeout(() => {
-                    if(act === "teleport_sepulchre_inside") player.position.set(-500, 0, -494);
+                    if(act === "teleport_sepulchre_inside") player.position.set(-500, 0, -495.3);
                     else if(act === "teleport_sepulchre_outside") player.position.set(-15, 0, -5);
                     else if(act === "teleport_inside") player.position.set(500, 0, 498);
                     else if(act === "teleport_outside") player.position.set(-10, 0, -32);
@@ -1056,7 +1128,7 @@
                         if (Math.abs(moveForwardInput) > 0.1) {
                             let nx = player.position.x + Math.sin(player.rotation.y) * speed * moveForwardInput;
                             let nz = player.position.z + Math.cos(player.rotation.y) * speed * moveForwardInput;
-                            if(Math.abs(nx) > 486 && Math.abs(nx) < 514 && Math.abs(nz) > 486 && Math.abs(nz) < 514) { player.position.set(nx, 0, nz); moved = true; }
+                            if(Math.abs(nx) > 494.9 && Math.abs(nx) < 504.7 && Math.abs(nz) > 495.2 && Math.abs(nz) < 504) { player.position.set(nx, 0, nz); moved = true; }
                         }
                     } else {
                         let mx = joyX;
