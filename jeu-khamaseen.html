@@ -143,7 +143,47 @@
         }
 
         /* Animation Bulle de Prédication */
-        #preaching-bubble {
+        /*#preaching-bubble {*/
+        /*    position: absolute;*/
+        /*    background: white;*/
+        /*    color: #b45309;*/
+        /*    padding: 10px 15px;*/
+        /*    border-radius: 15px;*/
+        /*    font-weight: bold;*/
+        /*    font-size: 14px;*/
+        /*    pointer-events: none;*/
+        /*    transform: translate(-50%, -100%);*/
+        /*    box-shadow: 0 4px 15px rgba(0,0,0,0.3);*/
+        /*    display: none;*/
+        /*    max-width: 420px;*/
+        /*    text-align: center;*/
+        /*    border: 3px solid #f59e0b;*/
+        /*    z-index: 500;*/
+        /*}*/
+        /*#preaching-bubble::after {*/
+        /*    content: '';*/
+        /*    position: absolute;*/
+        /*    bottom: -10px;*/
+        /*    left: 50%;*/
+        /*    margin-left: -10px;*/
+        /*    border-width: 10px 10px 0;*/
+        /*    border-style: solid;*/
+        /*    border-color: white transparent transparent transparent;*/
+        /*}*/
+        /*#preaching-bubble::before {*/
+        /*    content: '';*/
+        /*    position: absolute;*/
+        /*    bottom: -14px;*/
+        /*    left: 50%;*/
+        /*    margin-left: -11px;*/
+        /*    border-width: 11px 11px 0;*/
+        /*    border-style: solid;*/
+        /*    border-color: #f59e0b transparent transparent transparent;*/
+        /*    z-index: -1;*/
+        /*}*/
+        
+        /* Animation Bulle de Prédication */
+        .speech-bubble {
             position: absolute;
             background: white;
             color: #b45309;
@@ -160,7 +200,7 @@
             border: 3px solid #f59e0b;
             z-index: 500;
         }
-        #preaching-bubble::after {
+        .speech-bubble::after {
             content: '';
             position: absolute;
             bottom: -10px;
@@ -170,7 +210,7 @@
             border-style: solid;
             border-color: white transparent transparent transparent;
         }
-        #preaching-bubble::before {
+        .speech-bubble::before {
             content: '';
             position: absolute;
             bottom: -14px;
@@ -392,7 +432,8 @@
             <div id="joystick-knob"></div>
         </div>
 
-        <div id="preaching-bubble"></div>
+        <div id="preaching-bubble" class="speech-bubble"></div>
+        <div id="tiberias-bubble" class="speech-bubble"></div>
 
         <div id="dialog-box">
             <div class="dialog-header" id="dialog-title">Titre</div>
@@ -550,9 +591,15 @@
             "« Que la repentance et le pardon soient prêchés en son nom. » (Luc 24)"
         ];
         
+        const tiberiasVerse = "« Jetez le filet du côté droit de la barque, et vous trouverez. » (Jean 21:6)";
+        
+        
         let lastVerseIndex = 0;
         let currentPreachText = preachingVerses[lastVerseIndex];
-
+        let isTiberiasPreaching = false;
+        let tiberiasPreachIndex = 0;
+        let tiberiasPreachTimer = 0;
+        
         function getNextVerse() {
             let nextIndex;
             do {
@@ -752,7 +799,7 @@
                 const netGeo = new THREE.BoxGeometry(4, 0.2, 4);
                 const netMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, wireframe: true });
                 tiberiasNet = new THREE.Mesh(netGeo, netMat);
-                tiberiasNet.position.set(-36, 1, -64); // Tenu au début
+                tiberiasNet.position.set(-36, 0.2, -64); // Tenu au début
                 scene.add(tiberiasNet);
 
                 // Les poissons
@@ -1194,7 +1241,7 @@
                     currentLookAt.lerp(tL, 0.1); camera.lookAt(currentLookAt);
                 } else {
                     player.visible = true; player.position.x = Math.max(-95, Math.min(95, player.position.x)); player.position.z = Math.max(-110, Math.min(145, player.position.z));
-                    camera.position.x += (player.position.x - camera.position.x)*0.1; camera.position.y += (5 - camera.position.y)*0.1; camera.position.z += (player.position.z + 15 - camera.position.z)*0.1; camera.lookAt(player.position);
+                    camera.position.x += (player.position.x - camera.position.x)*0.1; camera.position.y += (7 - camera.position.y)*0.1; camera.position.z += (player.position.z + 15 - camera.position.z)*0.1; camera.lookAt(player.position);
                 }
                 
                 updateUI(moved);
@@ -1234,16 +1281,23 @@
                 
                     switch (fishingState) {
                         case "lowering":
-                            if (tiberiasNet.position.x > -43) tiberiasNet.position.x -= 0.1;
-                            if (tiberiasNet.position.z > -64) tiberiasNet.position.z -= 0.1;
-                            if (tiberiasNet.position.y > 0.1) tiberiasNet.position.y -= 0.05;
-                           if (tiberiasNet.position.x <= -43) {
-                                fishingState = "waiting_fishes";
+                            
+                            if (animationTimer == 0){
                                 animationTimer = Date.now();
+                            } else if (Date.now() - animationTimer <= 3000) {
+                                // wait
+                            } else {
+                                if (tiberiasNet.position.x > -43) tiberiasNet.position.x -= 0.1;
+                                if (tiberiasNet.position.z > -64) tiberiasNet.position.z -= 0.1;
+                                if (tiberiasNet.position.y > 0.0) tiberiasNet.position.y -= 0.05;
+                               if (tiberiasNet.position.x <= -43) {
+                                    fishingState = "waiting_fishes";
+                                    animationTimer = Date.now();
+                                }
                             }
                             break;
                         case "waiting_fishes":
-                            if (Date.now() - animationTimer >= 1000) {
+                            if (Date.now() - animationTimer >= 1300) {
                                 fishingState = "showing_fishes";
                                 animationTimer = Date.now();
                             }
@@ -1254,7 +1308,7 @@
                                 f.rotation.z = Math.sin(Date.now() * 0.01 + i) * 0.5;
                                 if (f.position.y < 0.2) f.position.y += 0.01;
                             });
-                            if (Date.now() - animationTimer >= 1000) {
+                            if (Date.now() - animationTimer >= 2500) {
                                 fishingState = "returning";
                             }
                             break;
@@ -1263,7 +1317,7 @@
                             let deltaX = 0; let deltaY = 0; let deltaZ = 0;
                             if (tiberiasNet.position.x < -36) { deltaX = 0.1; isNetReturned = false; }
                             if (tiberiasNet.position.z < -64) { deltaZ = 0.1; isNetReturned = false; }
-                            if (tiberiasNet.position.y < 1)   { deltaY = 0.05; isNetReturned = false; }
+                            if (tiberiasNet.position.y < 0.3)   { deltaY = 0.05; isNetReturned = false; }
                 
                             tiberiasNet.position.x += deltaX;
                             tiberiasNet.position.z += deltaZ;
@@ -1284,6 +1338,7 @@
                                 });
                                 fishingState = "idle";
                             }
+                            animationTimer = 0;
                             break;
                     }
                 }
@@ -1350,6 +1405,50 @@
                         isPreaching = false;
                     }
                 }
+                
+                 // --- BULLLE TIBÉRIADE ---
+                const bT = document.getElementById('tiberias-bubble');
+                
+                if (bT) {
+                // Position de Jésus à Tiberiad : x: 35, y: 0, z: -60
+                    const tPos = new THREE.Vector3(-35, 0, -60);
+                    const distToT = player.position.distanceTo(tPos);
+                    
+                    if (distToT < 15) {
+                        const headPos = new THREE.Vector3(-35, 2.2, -60); // Au-dessus de la tête
+                        headPos.project(camera);
+                        
+                        // S'assurer que le point est devant la caméra
+                        if (headPos.z < 1) {
+                            const bx = (headPos.x * 0.5 + 0.5) * window.innerWidth;
+                            const by = (headPos.y * -0.5 + 0.5) * window.innerHeight;
+                            bT.style.left = bx + 'px';
+                            bT.style.top = by + 'px';
+                            bT.style.display = 'block';
+
+                            // Logique de frappe animée
+                            if (!isTiberiasPreaching) {
+                                isTiberiasPreaching = true;
+                                tiberiasPreachIndex = 0;
+                                tiberiasPreachTimer = Date.now();
+                            } else {
+                                if (Date.now() - tiberiasPreachTimer > 40) { // Vitesse d'apparition des lettres
+                                    if (tiberiasPreachIndex < tiberiasVerse.length) {
+                                        bT.innerText = tiberiasVerse.substring(0, tiberiasPreachIndex + 1);
+                                        tiberiasPreachIndex++;
+                                        tiberiasPreachTimer = Date.now();
+                                    } 
+                                }
+                            }
+                        } else {
+                            bT.style.display = 'none';
+                            isTiberiasPreaching = false;
+                        }
+                    } else {
+                        bT.style.display = 'none';
+                        isTiberiasPreaching = false;
+                    }
+                } else { bT.style.display = 'none'; isTiberiasPreaching = false; }
 
                 renderer.render(scene, camera);
             }
