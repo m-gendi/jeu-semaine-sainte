@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -140,6 +141,46 @@
             border: 1px solid #f59e0b;
             transition: opacity 0.2s;
             white-space: nowrap;
+        }
+
+        /* Animation Bulle de Prédication */
+        #preaching-bubble {
+            position: absolute;
+            background: white;
+            color: #b45309;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 14px;
+            pointer-events: none;
+            transform: translate(-50%, -100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: none;
+            max-width: 220px;
+            text-align: center;
+            border: 3px solid #f59e0b;
+            z-index: 500;
+        }
+        #preaching-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            margin-left: -10px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+        #preaching-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 50%;
+            margin-left: -11px;
+            border-width: 11px 11px 0;
+            border-style: solid;
+            border-color: #f59e0b transparent transparent transparent;
+            z-index: -1;
         }
 
         #fade-overlay {
@@ -352,6 +393,8 @@
             <div id="joystick-knob"></div>
         </div>
 
+        <div id="preaching-bubble"></div>
+
         <div id="dialog-box">
             <div class="dialog-header" id="dialog-title">Titre</div>
             <div class="dialog-content">
@@ -404,7 +447,7 @@
                 sources: "Bible : Jean 20:6-7. Exégèse copte.", action: "dialog"
             },
             {
-                id: "sepulchre_exit", name: "Sortir du Tombeau", position: { x: -501.5, z: -494.9 }, color: 0x475569,
+                id: "sepulchre_exit", name: "Sortir du Tombeau", position: { x: -501.5, z: -495.7 }, color: 0x475569,
                 title: "Sortir", quote: "", dogma: "", sources: "", action: "teleport_sepulchre_outside"
             },
             {
@@ -495,6 +538,19 @@
         // --- MOTEUR 3D ---
         let scene, camera, renderer, player, sStone, divineLight, tiberiasNet; 
         let fishes = [];
+        
+        // Variables d'animation pour la bulle de prêche
+        let isPreaching = false;
+        let preachIndex = 0;
+        let preachTimer = 0;
+        const preachingVerses = [
+            "« Allez, faites de toutes les nations des disciples... » (Matt 28)",
+            "« Allez par tout le monde, et prêchez la bonne nouvelle... » (Marc 16)",
+            "« Vous serez mes témoins jusqu'aux extrémités de la terre. » (Actes 1)",
+            "« Comme le Père m'a envoyé, moi aussi je vous envoie. » (Jean 20)",
+            "« Que la repentance et le pardon soient prêchés en son nom. » (Luc 24)"
+        ];
+        let currentPreachText = preachingVerses[0];
         
         window.onload = function() {
             let npcs = [];
@@ -669,7 +725,7 @@
                 const emmRoof = new THREE.Mesh(new THREE.BoxGeometry(11, 0.5, 10), woodMat); emmRoof.position.set(15, 5, -30); scene.add(emmRoof);
                 const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 3), woodMat); tableTop.position.set(15, 1.5, -27); scene.add(tableTop);
                 const bread = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2), new THREE.MeshStandardMaterial({ color: 0xf59e0b })); bread.position.set(15, 1.7, -27); scene.add(bread);
-                
+
                 createGroundPatch(-5, -55, 35, 50, 0x9ca3af, 0.01);
                 createBuilding(-10, -38, 8, 7, 6, houseMat);
                 obstacles.push({ minX: -14.5, maxX: -5.5, minZ: -41.5, maxZ: -34.5 });
@@ -859,113 +915,70 @@
 
             function handleJoyEnd() { isDragging = false; joystickZone.style.display = 'none'; joyX = 0; joyY = 0; }
 
-            // // Personnages Low-Poly réalistes
-            // function createHuman(c, glow = false) {
-            //     const g = new THREE.Group(); 
-            //     const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
-            //     const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
-            //     const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
-
-            //     const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
-            //     body.position.y = 0.55; body.castShadow = !glow;
-
-            //     const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
-            //     shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
-
-            //     const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
-            //     neck.position.y = 1.25; neck.castShadow = !glow;
-
-            //     const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
-            //     head.position.y = 1.45; head.castShadow = !glow;
-
-            //     const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
-            //     armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
-
-            //     const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
-            //     armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
-
-            //     const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
-            //     const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
-
-            //     g.add(body, shoulders, neck, head, armL, armR, handL, handR);
-            //     if (!glow) {
-            //         const hair = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.7), hairMat);
-            //         hair.position.y = 1.46; hair.castShadow = true; g.add(hair);
-            //     }
-            //     g.position.y = 0; return g;
-            // }
-            
             // Personnages Low-Poly réalistes (Visage visible)
-function createHuman(c, glow = false) {
-    const g = new THREE.Group(); 
-    const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
-    const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
-    const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
-    
-    // Matériaux pour les détails du visage
-    const eyeMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3 });
-    const lipMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x8b5a5a, roughness: 0.6 });
+            function createHuman(c, glow = false) {
+                const g = new THREE.Group(); 
+                const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 });
+                const skinMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.5 });
+                const hairMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x2e1b0f, roughness: 0.9 });
+                
+                // Matériaux pour les détails du visage
+                const eyeMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3 });
+                const lipMat = glow ? m : new THREE.MeshStandardMaterial({ color: 0x8b5a5a, roughness: 0.6 });
 
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
-    body.position.y = 0.55; body.castShadow = !glow;
+                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 1.1, 16), m);
+                body.position.y = 0.55; body.castShadow = !glow;
 
-    const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
-    shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
+                const shoulders = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), m);
+                shoulders.position.y = 1.1; shoulders.scale.set(1.5, 0.8, 1); shoulders.castShadow = !glow;
 
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
-    neck.position.y = 1.25; neck.castShadow = !glow;
+                const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.15, 8), skinMat);
+                neck.position.y = 1.25; neck.castShadow = !glow;
 
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
-    head.position.y = 1.45; head.castShadow = !glow;
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
+                head.position.y = 1.45; head.castShadow = !glow;
 
-    // --- AJOUT DES TRAITS DU VISAGE ---
-    const eyeGeom = new THREE.SphereGeometry(0.025, 8, 8);
-    const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
-    eyeL.position.set(-0.08, 1.48, 0.19);
-    
-    const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
-    eyeR.position.set(0.08, 1.48, 0.19);
+                // --- AJOUT DES TRAITS DU VISAGE ---
+                const eyeGeom = new THREE.SphereGeometry(0.025, 8, 8);
+                const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
+                eyeL.position.set(-0.08, 1.48, 0.19);
+                
+                const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
+                eyeR.position.set(0.08, 1.48, 0.19);
 
-    const noseGeom = new THREE.ConeGeometry(0.025, 0.08, 4);
-    const nose = new THREE.Mesh(noseGeom, skinMat);
-    nose.position.set(0, 1.41, 0.22);
-    nose.rotation.x = Math.PI / 2;
+                const noseGeom = new THREE.ConeGeometry(0.025, 0.08, 4);
+                const nose = new THREE.Mesh(noseGeom, skinMat);
+                nose.position.set(0, 1.41, 0.22);
+                nose.rotation.x = Math.PI / 2;
 
-    const mouthGeom = new THREE.BoxGeometry(0.08, 0.015, 0.03);
-    const mouth = new THREE.Mesh(mouthGeom, lipMat);
-    mouth.position.set(0, 1.34, 0.19);
-    // ---------------------------------
+                const mouthGeom = new THREE.BoxGeometry(0.08, 0.015, 0.03);
+                const mouth = new THREE.Mesh(mouthGeom, lipMat);
+                mouth.position.set(0, 1.34, 0.19);
+                // ---------------------------------
 
-    const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
-    armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
+                const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+                armL.position.set(-0.35, 0.85, 0); armL.rotation.z = Math.PI / 10; armL.castShadow = !glow;
 
-    const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
-    armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
+                const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.6, 8), m);
+                armR.position.set(0.35, 0.85, 0); armR.rotation.z = -Math.PI / 10; armR.castShadow = !glow;
 
-    const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
-    const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
+                const handL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handL.position.set(-0.45, 0.5, 0);
+                const handR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), skinMat); handR.position.set(0.45, 0.5, 0);
 
-    g.add(body, shoulders, neck, head, eyeL, eyeR, nose, mouth, armL, armR, handL, handR);
+                g.add(body, shoulders, neck, head, eyeL, eyeR, nose, mouth, armL, armR, handL, handR);
 
-    // Ajout des cheveux uniquement si le personnage n'est pas "glow"
-    if (!glow) {
-        // MODIFICATION : phiLength réduit de Math.PI * 2 à Math.PI * 1.4 (environ 250 degrés)
-        const hairGeom = new THREE.SphereGeometry(0.24, 16, 16, 5.7, Math.PI * 1.4, 0, Math.PI / 1.7);
-        const hair = new THREE.Mesh(hairGeom, hairMat);
-        hair.position.y = 1.46; 
-        
-        // MODIFICATION : Rotation de PI (180 degrés) autour de Y pour orienter l'ouverture vers l'avant.
-        hair.rotation.y = Math.PI; 
-        
-        
-        hair.castShadow = true; 
-        g.add(hair);
-    }
-    
-    
-    g.position.y = 0; 
-    return g;
-}
+                if (!glow) {
+                    const hairGeom = new THREE.SphereGeometry(0.24, 16, 16, 5.7, Math.PI * 1.4, 0, Math.PI / 1.7);
+                    const hair = new THREE.Mesh(hairGeom, hairMat);
+                    hair.position.y = 1.46; 
+                    hair.rotation.y = Math.PI; 
+                    hair.castShadow = true; 
+                    g.add(hair);
+                }
+                
+                g.position.y = 0; 
+                return g;
+            }
 
             function onWindowResize() { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
 
@@ -1092,7 +1105,6 @@ function createHuman(c, glow = false) {
                         const isMobile = window.innerWidth < 768;
                         btn.innerHTML = isMobile ? txt : txt + '<br><small style="font-size:10px">(Espace)</small>'; 
                         btn.style.display = 'flex'; 
-                        btn.style.flexDirection = 'column';
                     } else {
                         btn.style.display = 'none';
                     }
@@ -1106,7 +1118,6 @@ function createHuman(c, glow = false) {
                 } 
                 return false; 
             }
-
 
             function animate() {
                 requestAnimationFrame(animate);
@@ -1169,11 +1180,10 @@ function createHuman(c, glow = false) {
                 updateUI(moved);
                 if (ascensionChrist && player.position.distanceTo(new THREE.Vector3(25, 0, -60)) < 20) { if(ascensionChrist.position.y < 6) ascensionChrist.position.y += 0.015; } else if(ascensionChrist) ascensionChrist.position.y = 0;
                 
-                // Pierre roulante vers la droite (+X)
+                // Pierre roulante
                 if (sStone) {
                     const distToTomb = player.position.distanceTo(new THREE.Vector3(-15, 0, -8));
                     if (distToTomb < 13 && player.position.x > -20) {
-                        // Ouverture (roule vers la droite, x de -15 vers -10.5)
                         if (sStone.position.x < -10.5) {
                             sStone.position.x += 0.08;
                             sStone.rotation.z -= 0.036;
@@ -1182,7 +1192,6 @@ function createHuman(c, glow = false) {
                             divineLight.intensity += 0.05;
                         }
                     } else {
-                        // Fermeture (roule vers la gauche pour reprendre sa place à -15)
                         if (sStone.position.x > -15) {
                             sStone.position.x -= 0.08;
                             sStone.rotation.z += 0.036;
@@ -1192,135 +1201,67 @@ function createHuman(c, glow = false) {
                         }
                     }
                 }
-       
 
-                // Animation Tiberias (Jeter le filet et poissons)
-                
-                // if (tiberiasNet) {
-                //     const distToTiberias = player.position.distanceTo(new THREE.Vector3(-35, 0, -64));
-                //     if (distToTiberias < 15) {
-                //         if (tiberiasNet.position.x > -43) tiberiasNet.position.x -= 0.1;
-                //         if (tiberiasNet.position.z > -64) tiberiasNet.position.z -= 0.1;
-                //         if (tiberiasNet.position.y > 0.1) tiberiasNet.position.y -= 0.05;
-
-                //         if (tiberiasNet.position.y <= 0.2) {
-                //             showFishes = setTimeout(() => {
-                //                  fishes.forEach((f, i) => {
-                //                 f.visible = true;
-                //                 f.rotation.z = Math.sin(Date.now() * 0.01 + i) * 0.5;
-                //                 if (f.position.y < 0.2) f.position.y += 0.01;
-                //             });
-                //             }, 1000);
-                //         }
-                        
-            
-                        
-                //     } else {
-                //         if (tiberiasNet.position.x < -36) tiberiasNet.position.x += 0.1;
-                //         if (tiberiasNet.position.z < -64) tiberiasNet.position.z += 0.1;
-                //         if (tiberiasNet.position.y < 1) tiberiasNet.position.y += 0.05;
-
-                //         fishes.forEach(f => {
-                //             f.visible = false;
-                //             f.position.y = 0;
-                //         });
-                //     }
-                // }
-
-            if (tiberiasNet) {
+                // Animation Tibériade
+                if (tiberiasNet) {
                     const distToTiberias = player.position.distanceTo(new THREE.Vector3(-35, 0, -64));
-                
-               
-                    // 1. Déclenchement initial si le joueur approche
                     if (distToTiberias < 20 && fishingState === "idle") {
                         fishingState = "lowering";
                     } 
-                    // Optionnel : Forcer le retour si le joueur s'éloigne prématurément
                     else if (distToTiberias >= 20 && fishingState !== "idle" && fishingState !== "returning") {
                         fishingState = "returning";
                     }
                 
-                    // 2. Gestion de la séquence d'animation selon l'état actuel
                     switch (fishingState) {
-                        
                         case "lowering":
-                            // Le filet descend
                             if (tiberiasNet.position.x > -43) tiberiasNet.position.x -= 0.1;
                             if (tiberiasNet.position.z > -64) tiberiasNet.position.z -= 0.1;
                             if (tiberiasNet.position.y > 0.1) tiberiasNet.position.y -= 0.05;
-                
-                            // Une fois en bas, on passe à l'attente
                            if (tiberiasNet.position.x <= -43) {
                                 fishingState = "waiting_fishes";
-                                animationTimer = Date.now(); // Démarrage du chronomètre
+                                animationTimer = Date.now();
                             }
                             break;
-                
                         case "waiting_fishes":
-                            // On attend 2 secondes (2000 ms) avant l'apparition des poissons
                             if (Date.now() - animationTimer >= 1000) {
                                 fishingState = "showing_fishes";
-                                animationTimer = Date.now(); // Réinitialisation du chrono pour la prochaine étape
+                                animationTimer = Date.now();
                             }
                             break;
-                
                         case "showing_fishes":
-                            // Les poissons apparaissent et s'animent
                             fishes.forEach((f, i) => {
                                 f.visible = true;
                                 f.rotation.z = Math.sin(Date.now() * 0.01 + i) * 0.5;
                                 if (f.position.y < 0.2) f.position.y += 0.01;
                             });
-                
-                            // On attend 2 autres secondes avant de remonter le filet
                             if (Date.now() - animationTimer >= 1000) {
                                 fishingState = "returning";
                             }
                             break;
-                
                        case "returning":
                             let isNetReturned = true;
-                            
-                            // 1. Calcul des incréments de déplacement pour cette frame
-                            let deltaX = 0;
-                            let deltaY = 0;
-                            let deltaZ = 0;
-                
+                            let deltaX = 0; let deltaY = 0; let deltaZ = 0;
                             if (tiberiasNet.position.x < -36) { deltaX = 0.1; isNetReturned = false; }
                             if (tiberiasNet.position.z < -64) { deltaZ = 0.1; isNetReturned = false; }
                             if (tiberiasNet.position.y < 1)   { deltaY = 0.05; isNetReturned = false; }
                 
-                            // 2. Application du déplacement au filet
                             tiberiasNet.position.x += deltaX;
                             tiberiasNet.position.z += deltaZ;
                             tiberiasNet.position.y += deltaY;
                 
-                            // 3. Application du MÊME déplacement aux poissons
                             fishes.forEach((f, i) => {
                                 f.position.x += deltaX;
                                 f.position.z += deltaZ;
                                 f.position.y += deltaY;
-                                
-                                // Optionnel : maintenir l'animation de frétillement pendant le trajet
                                 f.rotation.z = Math.sin(Date.now() * 0.01 + i) * 0.5;
                             });
                 
-                            // 4. Si le filet est revenu à sa place et que le joueur s'éloigne
                             if (isNetReturned && distToTiberias >= 20) {
-                                // C'est seulement à la fin du trajet qu'on masque les poissons
                                 fishes.forEach(f => {
-                                    // 1. On masque les poissons
                                     f.visible = false;
-                                    
-                                    // 2. On restaure la position exacte d'origine
-                                    if (f.initialPosition) {
-                                        f.position.copy(f.initialPosition);
-                                    } else {
-                                        // Valeur de secours si userData n'a pas été défini
-                                        f.position.y = 0; 
-                                    }
+                                    if (f.initialPosition) f.position.copy(f.initialPosition);
+                                    else f.position.y = 0; 
                                 });
-                                
                                 fishingState = "idle";
                             }
                             break;
@@ -1341,6 +1282,56 @@ function createHuman(c, glow = false) {
                         flames.forEach(f => { if (f.position.y < 8) f.position.y += 0.1; }); 
                     }
                 }
+
+                // --- ANIMATION DE LA BULLE DE PRÉDICATION ---
+                const preachingBubble = document.getElementById('preaching-bubble');
+                if (preachingBubble) {
+                    // Position de Jésus à la Commission : x: 45.2, y: 5, z: -79.6
+                    const commissionPos = new THREE.Vector3(45.2, 0, -79.6);
+                    const distToCommission = player.position.distanceTo(commissionPos);
+                    
+                    if (distToCommission < 30) {
+                        const headPos = new THREE.Vector3(45.2, 7.5, -79.6); // Au-dessus de la tête
+                        headPos.project(camera);
+                        
+                        // S'assurer que le point est devant la caméra
+                        if (headPos.z < 1) {
+                            const bx = (headPos.x * 0.5 + 0.5) * window.innerWidth;
+                            const by = (headPos.y * -0.5 + 0.5) * window.innerHeight;
+                            preachingBubble.style.left = bx + 'px';
+                            preachingBubble.style.top = by + 'px';
+                            preachingBubble.style.display = 'block';
+
+                            // Logique de frappe animée
+                            if (!isPreaching) {
+                                isPreaching = true;
+                                preachIndex = 0;
+                                currentPreachText = preachingVerses[Math.floor(Math.random() * preachingVerses.length)];
+                                preachingBubble.innerText = "";
+                                preachTimer = Date.now();
+                            } else {
+                                if (Date.now() - preachTimer > 80) { // Vitesse d'apparition des lettres
+                                    if (preachIndex < currentPreachText.length) {
+                                        preachingBubble.innerText = currentPreachText.substring(0, preachIndex + 1);
+                                        preachIndex++;
+                                        preachTimer = Date.now();
+                                    } else if (Date.now() - preachTimer > 4000) { // Pause de 4 sec à la fin avant de relancer
+                                        preachIndex = 0; 
+                                        currentPreachText = preachingVerses[Math.floor(Math.random() * preachingVerses.length)];
+                                        preachTimer = Date.now();
+                                    }
+                                }
+                            }
+                        } else {
+                            preachingBubble.style.display = 'none';
+                            isPreaching = false;
+                        }
+                    } else {
+                        preachingBubble.style.display = 'none';
+                        isPreaching = false;
+                    }
+                }
+
                 renderer.render(scene, camera);
             }
         };
